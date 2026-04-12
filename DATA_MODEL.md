@@ -46,5 +46,6 @@
 
   - Workout session
     - Date and time
+    - Timezone
     - exercise entries (many)
       - exercies + details
