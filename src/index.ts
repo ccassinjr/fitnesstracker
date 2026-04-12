@@ -20,7 +20,7 @@ type PhysicalInfo = {
   weight: Array<WeightEntry>;
 };
 
-const ccassin: PhysicalInfo = {
+const ccassinjr: PhysicalInfo = {
   name: "Carlos Junior",
   height: 181,
   sex: "male",
@@ -28,4 +28,14 @@ const ccassin: PhysicalInfo = {
   fitness_level: { type: "FitnessCategory", category: "moderately active" },
   weight: [{ weight: 77000, timestamp: 1776016587021 }],
 };
-console.log(ccassin);
+const { height, sex, birthdate, fitness_level, weight } = ccassinjr;
+const lastWeight = weight[weight.length - 1];
+
+document.body.innerHTML = `
+  <h1>${ccassinjr.name}</h1>
+  <p>Sex: ${sex}</p>
+  <p>Height: ${height} cm</p>
+  <p>Birthdate: ${birthdate.day}/${birthdate.month}/${birthdate.year}</p>
+  <p>Fitness level: ${fitness_level.type === "FitnessCategory" ? fitness_level.category : fitness_level.daily_expenditure_calories + " kcal/day"}</p>
+  <p>Latest weight: ${lastWeight !== undefined ? lastWeight.weight / 1000 + " kg" : "N/A"}</p>
+`;
