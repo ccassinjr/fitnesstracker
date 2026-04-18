@@ -1,5 +1,6 @@
 - Track calories
   - Person's physical info
+    - Name?
     - Height
     - Sex
     - Date of birth
@@ -11,11 +12,20 @@
       - weight
       - date and time
 
+  - Goal?
+      - category: cut / bulk / maintenance?
+      - target weight
+      - daily target calories / protein / carbs / fat (grams)
+      - start date
+      - end date (optional)
+
   - Food intake
     - Individual food item macronutrients
-      - Carbs (percentage)
-      - Protein (percentage)
-      - Fat  (percentage)
+      - Name?
+      - Calories per 100grams?
+      - Carbs (percentage)? - per 100grams instead?
+      - Protein (percentage) - per 100grams instead?
+      - Fat  (percentage) - per 100grams instead?
       - Common portions: many entries
         - name
         - weight or volume
@@ -31,13 +41,16 @@
       - volume
       - date and time
 
+  - Daily log?
+
 - Track workout routines
   - Exercises
     - name
-    - category
+    - category or type: strenght / cardio?
+    - muscle group if strenght: chest / back / legs / shoulders / arms / core
     - details
-      - duration
-      - intensity
+      - duration - probably for cardio only?
+      - intensity - probably for cardio only?
       OR
       - rest period
       - sets (many)
@@ -49,3 +62,5 @@
     - Timezone
     - exercise entries (many)
       - exercies + details
+
+  - Daily log that connects both caloric tracking and workout
