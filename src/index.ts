@@ -34,6 +34,27 @@ const database: Database = {
     weight: [{ weight: 77000, timestamp: 1776016587021 }],
   },
 };
+
+function handleUpdatePhysicalInfo(e: SubmitEvent) {
+  e.preventDefault();
+  if (e.target == null) {
+    throw new Error("Missing event target");
+  } else if (!(e.target instanceof HTMLFormElement)) {
+    throw new Error("Unexpected target type");
+  }
+  const formData = new FormData(e.target);
+  const weight = formData.get("weight");
+  if (weight == null || typeof weight !== "string") {
+    throw new Error("Missing required weight field");
+  }
+
+  database.physicalInfo.weight.push({
+    weight: parseInt(weight, 10),
+    timestamp: Date.now(),
+  });
+  render(database, document.body);
+}
+
 // This function takes a Datbase and an HTML element, and
 // displays the database's content inside the given HTML element.
 function render(db: Database, element: HTMLElement) {
@@ -46,7 +67,16 @@ function render(db: Database, element: HTMLElement) {
   <p>Height: ${db.physicalInfo.height} cm</p>
   <p>Birthdate: ${db.physicalInfo.birthdate.day}/${db.physicalInfo.birthdate.month}/${db.physicalInfo.birthdate.year}</p>
   <p>Fitness level: ${db.physicalInfo.fitness_level.type === "FitnessCategory" ? db.physicalInfo.fitness_level.category : db.physicalInfo.fitness_level.daily_expenditure_calories + " kcal/day"}</p>
-  <p>Latest weight: ${lastWeight !== undefined ? lastWeight.weight / 1000 + " kg" : "N/A"}</p>`;
+  <p>Latest weight: ${lastWeight !== undefined ? lastWeight.weight / 1000 + " kg" : "N/A"}</p>
+  <hr/>
+ 
+  <h2>Edit Physical info</h2>
+  <form onsubmit="handleUpdatePhysicalInfo(event)">
+    <h3>Add new weight measurement</h3>
+    <input name="weight" type="number" placeholder="Weight in grams"/>
+    <button type="submit">Add weight measurement</button>
+  </form>
+  `;
 }
 
 render(database, document.body);
