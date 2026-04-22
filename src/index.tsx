@@ -124,25 +124,21 @@ function EditPhysicalInfo({
   database: Database;
   setDatabase: React.Dispatch<React.SetStateAction<Database>>;
 }) {
+  const [weight, setWeight] = useState(0);
+
   function handleUpdatePhysicalInfo(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const weight = formData.get("weight");
-    if (weight == null || typeof weight !== "string") {
-      throw new Error("Missing required weight field");
-    }
     setDatabase({
       ...database,
       physicalInfo: {
         ...database.physicalInfo,
         weight: [
           ...database.physicalInfo.weight,
-          { weight: parseInt(weight, 10), timestamp: Date.now() },
+          { weight, timestamp: Date.now() },
         ],
       },
     });
-    form.reset();
+    setWeight(0);
   }
 
   return (
@@ -155,6 +151,11 @@ function EditPhysicalInfo({
           type="number"
           placeholder="Weight in grams"
           required
+          value={weight}
+          onChange={(e) => {
+            const v = e.target.valueAsNumber;
+            if (!isNaN(v)) setWeight(v);
+          }}
         />
         <button type="submit">Add weight measurement</button>
       </form>
@@ -169,60 +170,91 @@ function AddFoodItem({
   database: Database;
   setDatabase: React.Dispatch<React.SetStateAction<Database>>;
 }) {
+  const [name, setName] = useState("");
+  const [caloriesPer100g, setCaloriesPer100g] = useState(0);
+  const [carbs, setCarbs] = useState(0);
+  const [protein, setProtein] = useState(0);
+  const [fat, setFat] = useState(0);
+
   function handleAddFood(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const name = formData.get("name");
-    if (name == null || typeof name !== "string") {
-      throw new Error("Missing required name field");
-    }
-    const calories_per_100g = formData.get("calories_per_100g");
-    if (calories_per_100g == null || typeof calories_per_100g !== "string") {
-      throw new Error("Missing required calories_per_100g field");
-    }
-    const carbs = formData.get("carbs");
-    if (carbs == null || typeof carbs !== "string") {
-      throw new Error("Missing required carbs field");
-    }
-    const protein = formData.get("protein");
-    if (protein == null || typeof protein !== "string") {
-      throw new Error("Missing required protein field");
-    }
-    const fat = formData.get("fat");
-    if (fat == null || typeof fat !== "string") {
-      throw new Error("Missing required fat field");
-    }
     setDatabase({
       ...database,
       foods: [
         ...database.foods,
         {
           name,
-          calories_per_100g: parseInt(calories_per_100g, 10),
-          carbs: parseInt(carbs, 10),
-          protein: parseInt(protein, 10),
-          fat: parseInt(fat, 10),
+          calories_per_100g: caloriesPer100g,
+          carbs,
+          protein,
+          fat,
           common_portions: [],
         },
       ],
     });
-    form.reset();
+    // reset the form.
+    setName("");
+    setCaloriesPer100g(0);
+    setCarbs(0);
+    setProtein(0);
+    setFat(0);
   }
   return (
     <>
       <h2>Add Food Item</h2>
       <form onSubmit={handleAddFood}>
-        <input name="name" type="text" placeholder="Food name" required />
+        <input
+          name="name"
+          type="text"
+          placeholder="Food name"
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
         <input
           name="calories_per_100g"
-          type="text"
+          type="number"
           placeholder="Calories per 100g"
           required
+          value={caloriesPer100g}
+          onChange={(e) => {
+            const v = e.target.valueAsNumber;
+            if (!isNaN(v)) setCaloriesPer100g(v);
+          }}
         />
-        <input name="carbs" type="text" placeholder="carbs" required />
-        <input name="protein" type="text" placeholder="protein" required />
-        <input name="fat" type="text" placeholder="fat" required />
+        <input
+          name="carbs"
+          type="number"
+          placeholder="carbs"
+          required
+          value={carbs}
+          onChange={(e) => {
+            const v = e.target.valueAsNumber;
+            if (!isNaN(v)) setCarbs(v);
+          }}
+        />
+        <input
+          name="protein"
+          type="number"
+          placeholder="protein"
+          required
+          value={protein}
+          onChange={(e) => {
+            const v = e.target.valueAsNumber;
+            if (!isNaN(v)) setProtein(v);
+          }}
+        />
+        <input
+          name="fat"
+          type="number"
+          placeholder="fat"
+          required
+          value={fat}
+          onChange={(e) => {
+            const v = e.target.valueAsNumber;
+            if (!isNaN(v)) setFat(v);
+          }}
+        />
         <button type="submit">Add food item</button>
       </form>
     </>
