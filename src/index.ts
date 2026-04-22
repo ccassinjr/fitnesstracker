@@ -143,6 +143,18 @@ function render(db: Database, element: HTMLElement) {
       `;
   }
 
+  function foodItemToRow(food: FoodItem): string {
+    return `
+      <tr>
+        <td>${food.name}</td>
+        <td>${food.calories_per_100g}</td>
+        <td>${food.carbs}%</td>
+        <td>${food.protein}%</td>
+        <td>${food.fat}%</td>
+      </tr>
+      `;
+  }
+
   element.innerHTML = `
   <h2>Physical Info</h2>
   <p>Name: ${db.physicalInfo.name}
@@ -170,6 +182,27 @@ function render(db: Database, element: HTMLElement) {
     <input name="weight" type="number" placeholder="Weight in grams" required/>
     <button type="submit">Add weight measurement</button>
   </form>
+
+  <h2>Food Items</h2>
+  ${
+    db.foods.length === 0
+      ? "<p>No food items added yet.</p>"
+      : `<table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Calories/100g</th>
+        <th>Carbs</th>
+        <th>Protein</th>
+        <th>Fat</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${db.foods.map(foodItemToRow).join("\n")}
+    </tbody>
+  </table>`
+  }
+  <hr/>
 
   <h2>Add Food Item</h2>
   <form onsubmit="handleAddFood(event)">
