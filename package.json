@@ -6,6 +6,7 @@
   "author": "",
   "type": "module",
   "scripts": {
+    "watch": "tsc --noEmit --watch",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"

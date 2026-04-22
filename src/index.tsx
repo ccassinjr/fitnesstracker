@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 
 type Database = {
@@ -71,77 +71,14 @@ function showWeight(grams: Grams): string {
   return grams / 1000 + " kg";
 }
 
-function App() {
-  const [database, setDatabase] = useState<Database>(initialDatabase);
-
-  function handleUpdatePhysicalInfo(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const weight = formData.get("weight");
-    if (weight == null || typeof weight !== "string") {
-      throw new Error("Missing required weight field");
-    }
-    setDatabase((db) => ({
-      ...db,
-      physicalInfo: {
-        ...db.physicalInfo,
-        weight: [
-          ...db.physicalInfo.weight,
-          { weight: parseInt(weight, 10), timestamp: Date.now() },
-        ],
-      },
-    }));
-    form.reset();
-  }
-
-  function handleAddFood(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const name = formData.get("name");
-    if (name == null || typeof name !== "string") {
-      throw new Error("Missing required name field");
-    }
-    const calories_per_100g = formData.get("calories_per_100g");
-    if (calories_per_100g == null || typeof calories_per_100g !== "string") {
-      throw new Error("Missing required calories_per_100g field");
-    }
-    const carbs = formData.get("carbs");
-    if (carbs == null || typeof carbs !== "string") {
-      throw new Error("Missing required carbs field");
-    }
-    const protein = formData.get("protein");
-    if (protein == null || typeof protein !== "string") {
-      throw new Error("Missing required protein field");
-    }
-    const fat = formData.get("fat");
-    if (fat == null || typeof fat !== "string") {
-      throw new Error("Missing required fat field");
-    }
-    setDatabase((db) => ({
-      ...db,
-      foods: [
-        ...db.foods,
-        {
-          name,
-          calories_per_100g: parseInt(calories_per_100g, 10),
-          carbs: parseInt(carbs, 10),
-          protein: parseInt(protein, 10),
-          fat: parseInt(fat, 10),
-          common_portions: [],
-        },
-      ],
-    }));
-    form.reset();
-  }
-
-  const { physicalInfo } = database;
+function PhysicalInfo({
+  physicalInfo,
+}: {
+  physicalInfo: PhysicalInfo;
+}): ReactElement {
   const lastWeight = physicalInfo.weight[physicalInfo.weight.length - 1];
-
   return (
     <>
-      <h1>Fitness Tracker</h1>
       <h2>Physical Info</h2>
       <p>Name: {physicalInfo.name}</p>
       <p>Sex: {physicalInfo.sex}</p>
@@ -176,8 +113,40 @@ function App() {
           ))}
         </tbody>
       </table>
-      <hr />
+    </>
+  );
+}
 
+function EditPhysicalInfo({
+  database,
+  setDatabase,
+}: {
+  database: Database;
+  setDatabase: React.Dispatch<React.SetStateAction<Database>>;
+}) {
+  function handleUpdatePhysicalInfo(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const weight = formData.get("weight");
+    if (weight == null || typeof weight !== "string") {
+      throw new Error("Missing required weight field");
+    }
+    setDatabase({
+      ...database,
+      physicalInfo: {
+        ...database.physicalInfo,
+        weight: [
+          ...database.physicalInfo.weight,
+          { weight: parseInt(weight, 10), timestamp: Date.now() },
+        ],
+      },
+    });
+    form.reset();
+  }
+
+  return (
+    <>
       <h2>Edit Physical info</h2>
       <form onSubmit={handleUpdatePhysicalInfo}>
         <h3>Add new weight measurement</h3>
@@ -189,7 +158,59 @@ function App() {
         />
         <button type="submit">Add weight measurement</button>
       </form>
+    </>
+  );
+}
 
+function AddFoodItem({
+  database,
+  setDatabase,
+}: {
+  database: Database;
+  setDatabase: React.Dispatch<React.SetStateAction<Database>>;
+}) {
+  function handleAddFood(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const name = formData.get("name");
+    if (name == null || typeof name !== "string") {
+      throw new Error("Missing required name field");
+    }
+    const calories_per_100g = formData.get("calories_per_100g");
+    if (calories_per_100g == null || typeof calories_per_100g !== "string") {
+      throw new Error("Missing required calories_per_100g field");
+    }
+    const carbs = formData.get("carbs");
+    if (carbs == null || typeof carbs !== "string") {
+      throw new Error("Missing required carbs field");
+    }
+    const protein = formData.get("protein");
+    if (protein == null || typeof protein !== "string") {
+      throw new Error("Missing required protein field");
+    }
+    const fat = formData.get("fat");
+    if (fat == null || typeof fat !== "string") {
+      throw new Error("Missing required fat field");
+    }
+    setDatabase({
+      ...database,
+      foods: [
+        ...database.foods,
+        {
+          name,
+          calories_per_100g: parseInt(calories_per_100g, 10),
+          carbs: parseInt(carbs, 10),
+          protein: parseInt(protein, 10),
+          fat: parseInt(fat, 10),
+          common_portions: [],
+        },
+      ],
+    });
+    form.reset();
+  }
+  return (
+    <>
       <h2>Add Food Item</h2>
       <form onSubmit={handleAddFood}>
         <input name="name" type="text" placeholder="Food name" required />
@@ -208,8 +229,35 @@ function App() {
   );
 }
 
+function App() {
+  const [database, setDatabase] = useState<Database>(initialDatabase);
+
+  return (
+    <>
+      <h1>Fitness Tracker</h1>
+      <PhysicalInfo physicalInfo={database.physicalInfo} />
+      <hr />
+      <EditPhysicalInfo database={database} setDatabase={setDatabase} />
+      <hr />
+      <AddFoodItem database={database} setDatabase={setDatabase} />
+    </>
+  );
+}
+
 const rootEl = document.getElementById("root");
 if (rootEl == null) {
   throw new Error("Missing root element");
 }
+
+// @ts-expect-error
+function ExampleApp() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (isOpen) {
+    return <h1 onClick={() => setIsOpen(false)}> IS OPEN </h1>;
+  } else {
+    return <h1 onClick={() => setIsOpen(true)}> IS CLOSED </h1>;
+  }
+}
+
 createRoot(rootEl).render(<App />);
