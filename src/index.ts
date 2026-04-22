@@ -1,9 +1,12 @@
 type Database = {
   physicalInfo: PhysicalInfo;
+  foods: Array<FoodItem>;
 };
+type Percentage = number;
 
 type Timestamp = number;
 type Grams = number;
+type Milliliters = number;
 type WeightEntry = { weight: Grams; timestamp: Timestamp };
 type FitnessLevel =
   | {
@@ -24,6 +27,24 @@ type PhysicalInfo = {
   weight: Array<WeightEntry>;
 };
 
+type FoodPortion = {
+  name: string;
+  amount: PortionAmount;
+};
+
+type PortionAmount =
+  | { type: "weight"; grams: Grams }
+  | { type: "volume"; milliliters: Milliliters };
+
+type FoodItem = {
+  name: string;
+  calories_per_100g: number;
+  carbs: Percentage;
+  protein: Percentage;
+  fat: Percentage;
+  common_portions: Array<FoodPortion>;
+};
+
 const database: Database = {
   physicalInfo: {
     name: "Carlos Junior",
@@ -33,6 +54,7 @@ const database: Database = {
     fitness_level: { type: "FitnessCategory", category: "moderately active" },
     weight: [{ weight: 77000, timestamp: 1776016587021 }],
   },
+  foods: [],
 };
 
 function handleUpdatePhysicalInfo(e: SubmitEvent) {
@@ -64,6 +86,46 @@ function showWeight(grams: Grams): string {
     return grams + " g";
   }
   return grams / 1000 + " kg";
+}
+
+function handleAddFood(e: SubmitEvent) {
+  e.preventDefault();
+  if (e.target == null) {
+    throw new Error("Missing event target");
+  } else if (!(e.target instanceof HTMLFormElement)) {
+    throw new Error("Unexpected target type");
+  }
+  const formData = new FormData(e.target);
+  const name = formData.get("name");
+  if (name == null || typeof name !== "string") {
+    throw new Error("Missing required name field");
+  }
+  const calories_per_100g = formData.get("calories_per_100g");
+  if (calories_per_100g == null || typeof calories_per_100g !== "string") {
+    throw new Error("Missing required calories_per_100g field");
+  }
+  const carbs = formData.get("carbs");
+  if (carbs == null || typeof carbs !== "string") {
+    throw new Error("Missing required carbs field");
+  }
+  const protein = formData.get("protein");
+  if (protein == null || typeof protein !== "string") {
+    throw new Error("Missing required protein field");
+  }
+  const fat = formData.get("fat");
+  if (fat == null || typeof fat !== "string") {
+    throw new Error("Missing required fat field");
+  }
+
+  database.foods.push({
+    name: name,
+    calories_per_100g: parseInt(calories_per_100g, 10),
+    carbs: parseInt(carbs, 10),
+    protein: parseInt(protein, 10),
+    fat: parseInt(fat, 10),
+    common_portions: [],
+  });
+  render(database, document.body);
 }
 
 // This function takes a Datbase and an HTML element, and
@@ -107,6 +169,16 @@ function render(db: Database, element: HTMLElement) {
     <h3>Add new weight measurement</h3>
     <input name="weight" type="number" placeholder="Weight in grams" required/>
     <button type="submit">Add weight measurement</button>
+  </form>
+
+  <h2>Add Food Item</h2>
+  <form onsubmit="handleAddFood(event)">
+    <input name="name" type="text" placeholder="Food name" required/>
+    <input name="calories_per_100g" type="text" placeholder="Calories per 100g" required/>
+    <input name="carbs" type="text" placeholder="carbs" required/>
+    <input name="protein" type="text" placeholder="protein" required/>
+    <input name="fat" type="text" placeholder="fat" required/>
+    <button type="submit">Add food item</button>
   </form>
   `;
 }
