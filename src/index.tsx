@@ -60,6 +60,13 @@ const initialDatabase: Database = {
   foods: [],
 };
 
+// Convert an object of class names into a string.
+function cn(classes: Record<string, boolean>): string {
+  return Object.keys(classes)
+    .filter((k) => classes[k])
+    .join(" ");
+}
+
 function showTimestamp(timestamp: Timestamp): string {
   return new Date(timestamp).toString();
 }
@@ -302,10 +309,34 @@ function App() {
   return (
     <>
       <h1>Fitness Tracker</h1>
-      <ul>
-        <li onClick={() => setSelectedTab("Home")}>Home</li>
-        <li onClick={() => setSelectedTab("PhysicalInfo")}>Physical Info</li>
-        <li onClick={() => setSelectedTab("FoodItems")}>Food Items</li>
+      <ul className="home-tabs">
+        <li
+          className={cn({
+            "home-tabs-tab": true,
+            active: selectedTab === "Home",
+          })}
+          onClick={() => setSelectedTab("Home")}
+        >
+          Home
+        </li>
+        <li
+          className={cn({
+            "home-tabs-tab": true,
+            active: selectedTab === "PhysicalInfo",
+          })}
+          onClick={() => setSelectedTab("PhysicalInfo")}
+        >
+          Physical Info
+        </li>
+        <li
+          className={cn({
+            "home-tabs-tab": true,
+            active: selectedTab === "FoodItems",
+          })}
+          onClick={() => setSelectedTab("FoodItems")}
+        >
+          Food Items
+        </li>
       </ul>
       {viewTab(selectedTab, database, setDatabase)}
     </>
