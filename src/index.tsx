@@ -261,10 +261,10 @@ function AddFoodItem({
   );
 }
 
-function FoodList({ foods } : { foods: Array<FoodItem> }) {
+function FoodList({ foods }: { foods: Array<FoodItem> }) {
   return (
     <>
-    <h2>Food List</h2>
+      <h2>Food List</h2>
       <table>
         <thead>
           <tr>
@@ -272,40 +272,73 @@ function FoodList({ foods } : { foods: Array<FoodItem> }) {
             <td>Calories per 100g</td>
             <td>Carbs</td>
             <td>Protein</td>
-            <td>Fat</td>            
+            <td>Fat</td>
           </tr>
         </thead>
-        <tbody>{foods.map((food, i) => (
-          <tr key={i}>
-            <td>{food.name}</td>
-            <td>{food.calories_per_100g}</td>
-            <td>{food.carbs}</td>
-            <td>{food.protein}</td>
-            <td>{food.fat}</td>
-          </tr>
-        ))
-}
+        <tbody>
+          {foods.map((food, i) => (
+            <tr key={i}>
+              <td>{food.name}</td>
+              <td>{food.calories_per_100g}</td>
+              <td>{food.carbs}</td>
+              <td>{food.protein}</td>
+              <td>{food.fat}</td>
+            </tr>
+          ))}
         </tbody>
-      </table> 
+      </table>
     </>
   );
 }
 
+type AppTabs = "Home" | "PhysicalInfo" | "FoodItems";
+
+type SetDatabase = React.Dispatch<React.SetStateAction<Database>>;
+
 function App() {
   const [database, setDatabase] = useState<Database>(initialDatabase);
+  const [selectedTab, setSelectedTab] = useState<AppTabs>("Home");
 
   return (
     <>
       <h1>Fitness Tracker</h1>
-      <PhysicalInfo physicalInfo={database.physicalInfo} />
-      <hr />
-      <EditPhysicalInfo database={database} setDatabase={setDatabase} />
-      <hr />
-      <FoodList foods={database.foods} />
-      <hr />
-      <AddFoodItem database={database} setDatabase={setDatabase} />
+      <ul>
+        <li onClick={() => setSelectedTab("Home")}>Home</li>
+        <li onClick={() => setSelectedTab("PhysicalInfo")}>Physical Info</li>
+        <li onClick={() => setSelectedTab("FoodItems")}>Food Items</li>
+      </ul>
+      {viewTab(selectedTab, database, setDatabase)}
     </>
   );
+}
+
+function viewTab(
+  tab: AppTabs,
+  database: Database,
+  setDatabase: SetDatabase,
+): ReactElement {
+  switch (tab) {
+    case "Home":
+      return <p>Welcome to Fitness Tracker</p>;
+    case "PhysicalInfo":
+      return (
+        <>
+          <PhysicalInfo physicalInfo={database.physicalInfo} />
+          <hr />
+          <EditPhysicalInfo database={database} setDatabase={setDatabase} />
+        </>
+      );
+    case "FoodItems":
+      return (
+        <>
+          <FoodList foods={database.foods} />
+          <hr />
+          <AddFoodItem database={database} setDatabase={setDatabase} />
+        </>
+      );
+    default:
+      return tab satisfies never;
+  }
 }
 
 const rootEl = document.getElementById("root");
