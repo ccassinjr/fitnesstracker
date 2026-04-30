@@ -175,7 +175,7 @@ function AddFoodItem({
   setDatabase,
 }: {
   database: Database;
-  setDatabase: React.Dispatch<React.SetStateAction<Database>>;
+  setDatabase: SetDatabase;
 }) {
   const [name, setName] = useState("");
   const [caloriesPer100g, setCaloriesPer100g] = useState(0);
@@ -316,19 +316,17 @@ function saveDatabase(database: Database): void {
 
 type AppTabs = "Home" | "PhysicalInfo" | "FoodItems";
 
-type SetDatabase = React.Dispatch<React.SetStateAction<Database>>;
+type SetDatabase = (db: Database) => void;
 
 function App() {
-  const [database, setDatabase] = useState<Database>(initialDatabase);
+  const [database, setDatabaseState] = useState<Database>(
+    loadDatabase() ?? initialDatabase,
+  );
   const [selectedTab, setSelectedTab] = useState<AppTabs>("Home");
 
-  function load() {
-    const loaded = loadDatabase();
-    if (loaded === null) {
-      console.info("No database to load");
-      return;
-    }
-    setDatabase(loaded);
+  function setDatabase(db: Database): void {
+    setDatabaseState(db);
+    saveDatabase(db);
   }
 
   return (
@@ -336,7 +334,7 @@ function App() {
       <div>
         <h1>Fitness Tracker</h1>
         <button onClick={() => saveDatabase(database)}>Save</button>
-        <button onClick={load}>Load</button>
+        <button onClick={() => setDatabase(initialDatabase)}>Reset</button>
       </div>
       <ul className="home-tabs">
         <li
