@@ -333,7 +333,6 @@ function App() {
     <>
       <div>
         <h1>Fitness Tracker</h1>
-        <button onClick={() => saveDatabase(database)}>Save</button>
         <button onClick={() => setDatabase(initialDatabase)}>Reset</button>
       </div>
       <ul className="home-tabs">
