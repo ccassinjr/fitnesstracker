@@ -298,6 +298,22 @@ function FoodList({ foods }: { foods: Array<FoodItem> }) {
   );
 }
 
+const DB_KEY = "database";
+
+function loadDatabase(): Database | null {
+  const found = window.localStorage.getItem(DB_KEY);
+  if (found === null) {
+    return null;
+  }
+
+  const database = JSON.parse(found) as Database;
+  return database;
+}
+
+function saveDatabase(database: Database): void {
+  window.localStorage.setItem(DB_KEY, JSON.stringify(database));
+}
+
 type AppTabs = "Home" | "PhysicalInfo" | "FoodItems";
 
 type SetDatabase = React.Dispatch<React.SetStateAction<Database>>;
@@ -306,9 +322,22 @@ function App() {
   const [database, setDatabase] = useState<Database>(initialDatabase);
   const [selectedTab, setSelectedTab] = useState<AppTabs>("Home");
 
+  function load() {
+    const loaded = loadDatabase();
+    if (loaded === null) {
+      console.info("No database to load");
+      return;
+    }
+    setDatabase(loaded);
+  }
+
   return (
     <>
-      <h1>Fitness Tracker</h1>
+      <div>
+        <h1>Fitness Tracker</h1>
+        <button onClick={() => saveDatabase(database)}>Save</button>
+        <button onClick={load}>Load</button>
+      </div>
       <ul className="home-tabs">
         <li
           className={cn({
