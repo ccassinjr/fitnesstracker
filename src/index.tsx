@@ -261,6 +261,36 @@ function AddFoodItem({
   );
 }
 
+function FoodList({ foods } : { foods: Array<FoodItem> }) {
+  return (
+    <>
+    <h2>Food List</h2>
+      <table>
+        <thead>
+          <tr>
+            <td>Name</td>
+            <td>Calories per 100g</td>
+            <td>Carbs</td>
+            <td>Protein</td>
+            <td>Fat</td>            
+          </tr>
+        </thead>
+        <tbody>{foods.map((food, i) => (
+          <tr key={i}>
+            <td>{food.name}</td>
+            <td>{food.calories_per_100g}</td>
+            <td>{food.carbs}</td>
+            <td>{food.protein}</td>
+            <td>{food.fat}</td>
+          </tr>
+        ))
+}
+        </tbody>
+      </table> 
+    </>
+  );
+}
+
 function App() {
   const [database, setDatabase] = useState<Database>(initialDatabase);
 
@@ -270,6 +300,8 @@ function App() {
       <PhysicalInfo physicalInfo={database.physicalInfo} />
       <hr />
       <EditPhysicalInfo database={database} setDatabase={setDatabase} />
+      <hr />
+      <FoodList foods={database.foods} />
       <hr />
       <AddFoodItem database={database} setDatabase={setDatabase} />
     </>
