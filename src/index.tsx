@@ -129,7 +129,7 @@ function EditPhysicalInfo({
   setDatabase,
 }: {
   database: Database;
-  setDatabase: React.Dispatch<React.SetStateAction<Database>>;
+  setDatabase: SetDatabase;
 }) {
   const [weight, setWeight] = useState(0);
 
@@ -210,25 +210,31 @@ function AddFoodItem({
     <>
       <h2>Add Food Item</h2>
       <form onSubmit={handleAddFood}>
-        <input
-          name="name"
-          type="text"
-          placeholder="Food name"
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          name="calories_per_100g"
-          type="number"
-          placeholder="Calories per 100g"
-          required
-          value={caloriesPer100g}
-          onChange={(e) => {
-            const v = e.target.valueAsNumber;
-            if (!isNaN(v)) setCaloriesPer100g(v);
-          }}
-        />
+        <div>
+          <label>Food Name</label>
+          <input
+            name="name"
+            type="text"
+            placeholder="Food name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Calories (per 100g)</label>
+          <input
+            name="calories_per_100g"
+            type="number"
+            placeholder="Calories per 100g"
+            required
+            value={caloriesPer100g}
+            onChange={(e) => {
+              const v = e.target.valueAsNumber;
+              if (!isNaN(v)) setCaloriesPer100g(v);
+            }}
+          />
+        </div>
         <input
           name="carbs"
           type="number"
@@ -314,6 +320,22 @@ function saveDatabase(database: Database): void {
   window.localStorage.setItem(DB_KEY, JSON.stringify(database));
 }
 
+const TAB_KEY = "tab";
+
+function loadTab(): AppTabs | null {
+  const found = window.localStorage.getItem(TAB_KEY);
+  if (found === null) {
+    return null;
+  }
+
+  const database = JSON.parse(found) as AppTabs;
+  return database;
+}
+
+function saveTab(tab: AppTabs): void {
+  window.localStorage.setItem(TAB_KEY, JSON.stringify(tab));
+}
+
 type AppTabs = "Home" | "PhysicalInfo" | "FoodItems";
 
 type SetDatabase = (db: Database) => void;
@@ -322,7 +344,14 @@ function App() {
   const [database, setDatabaseState] = useState<Database>(
     loadDatabase() ?? initialDatabase,
   );
-  const [selectedTab, setSelectedTab] = useState<AppTabs>("Home");
+  const [selectedTab, setSelectedTabState] = useState<AppTabs>(
+    loadTab() ?? "Home",
+  );
+
+  function setSelectedTab(tab: AppTabs): void {
+    setSelectedTabState(tab);
+    saveTab(tab);
+  }
 
   function setDatabase(db: Database): void {
     setDatabaseState(db);
@@ -394,7 +423,8 @@ function viewTab(
         </>
       );
     default:
-      return tab satisfies never;
+      tab satisfies never;
+      throw new Error(`Invalid tab name: '${tab}'`);
   }
 }
 
