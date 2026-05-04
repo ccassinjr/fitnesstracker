@@ -235,6 +235,8 @@ function AddFoodItem({
             }}
           />
         </div>
+        <div>
+        <label>Carbs</label>
         <input
           name="carbs"
           type="number"
@@ -246,6 +248,9 @@ function AddFoodItem({
             if (!isNaN(v)) setCarbs(v);
           }}
         />
+        </div>
+        <div>
+        <label>Protein</label>
         <input
           name="protein"
           type="number"
@@ -257,6 +262,9 @@ function AddFoodItem({
             if (!isNaN(v)) setProtein(v);
           }}
         />
+        </div>
+        <div>
+        <label>Fat</label>
         <input
           name="fat"
           type="number"
@@ -268,7 +276,10 @@ function AddFoodItem({
             if (!isNaN(v)) setFat(v);
           }}
         />
+        </div>
+        <div>
         <button type="submit">Add food item</button>
+        </div>
       </form>
     </>
   );
@@ -347,6 +358,7 @@ function App() {
   const [selectedTab, setSelectedTabState] = useState<AppTabs>(
     loadTab() ?? "Home",
   );
+  const [hasReset, setHasReset] = useState(false);
 
   function setSelectedTab(tab: AppTabs): void {
     setSelectedTabState(tab);
@@ -362,7 +374,14 @@ function App() {
     <>
       <div>
         <h1>Fitness Tracker</h1>
-        <button onClick={() => setDatabase(initialDatabase)}>Reset</button>
+        <button onClick={() => { 
+        setDatabase(initialDatabase); 
+        setHasReset(true);
+        setTimeout(() => {
+          setHasReset(false);
+          }, 3000);}}
+        >Reset</button>
+        {hasReset ? <p>Database has been reset!</p> : null}
       </div>
       <ul className="home-tabs">
         <li
