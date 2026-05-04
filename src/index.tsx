@@ -285,7 +285,7 @@ function AddFoodItem({
   );
 }
 
-function FoodList({ foods }: { foods: Array<FoodItem> }) {
+function FoodList({ foods, onDeleteFood }: { foods: Array<FoodItem>, onDeleteFood: (i: number) => void}) {
   return (
     <>
       <h2>Food List</h2>
@@ -307,6 +307,7 @@ function FoodList({ foods }: { foods: Array<FoodItem> }) {
               <td>{food.carbs}</td>
               <td>{food.protein}</td>
               <td>{food.fat}</td>
+              <td><button onClick={() => onDeleteFood(i)}>Delete</button></td>
             </tr>
           ))}
         </tbody>
@@ -370,6 +371,13 @@ function App() {
     saveDatabase(db);
   }
 
+  function deleteFood(i: number): void {
+    setDatabase({
+      ...database,
+      foods: database.foods.filter((food, index) => index !== i)
+    });
+  }
+
   return (
     <>
       <div>
@@ -412,7 +420,7 @@ function App() {
           Food Items
         </li>
       </ul>
-      {viewTab(selectedTab, database, setDatabase)}
+      {viewTab(selectedTab, database, setDatabase, deleteFood)}
     </>
   );
 }
@@ -421,6 +429,7 @@ function viewTab(
   tab: AppTabs,
   database: Database,
   setDatabase: SetDatabase,
+  deleteFood: (i: number) => void,
 ): ReactElement {
   switch (tab) {
     case "Home":
@@ -436,7 +445,7 @@ function viewTab(
     case "FoodItems":
       return (
         <>
-          <FoodList foods={database.foods} />
+          <FoodList foods={database.foods} onDeleteFood={deleteFood} />
           <hr />
           <AddFoodItem database={database} setDatabase={setDatabase} />
         </>
