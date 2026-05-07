@@ -80,14 +80,114 @@ function showWeight(grams: Grams): string {
 
 function PhysicalInfo({
   physicalInfo,
+  setDatabase,
+  database,
 }: {
   physicalInfo: PhysicalInfo;
+  setDatabase: SetDatabase;
+  database: Database;
 }): ReactElement {
-  const lastWeight = physicalInfo.weight[physicalInfo.weight.length - 1];
+    const lastWeight = physicalInfo.weight[physicalInfo.weight.length - 1];
+    const [isEditing, setIsEditing] = useState(false);
+    const [name, setName] = useState(physicalInfo.name);
+    const [sex, setSex] = useState(physicalInfo.sex);
+    const [height, setHeight] = useState(physicalInfo.height);
+    const [birthdate, setBirthdate] = useState(physicalInfo.birthdate);
+    const [fitnessLevel, setFitnessLevel] = useState(physicalInfo.fitness_level);
+    const [fitnessType, setFitnessType] = useState(physicalInfo.fitness_level.type);
+    function handleSave(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setDatabase({
+      ...database,
+      physicalInfo: {
+        ...database.physicalInfo,
+            name: name,
+            sex: sex,
+            height: height,
+            birthdate: birthdate,
+            fitness_level: fitnessLevel
+    }
+  });
+  setIsEditing(false);
+}
   return (
     <>
       <h2>Physical Info</h2>
-      <p>Name: {physicalInfo.name}</p>
+      {isEditing ? <form onSubmit={handleSave}>
+        <div>
+          <label>Name</label>
+          <input
+          name="name"
+          type="text"
+          placeholder="Your name"
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}/>
+        </div>
+        <div>
+          <label>Sex</label>
+          <select value={sex} onChange={(e) => setSex(e.target.value as "male" | "female" | "other")}>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label>Height (cm)</label>
+          <input 
+          type="number"
+          value={height}
+          onChange={(e) => setHeight(e.target.valueAsNumber)} />
+        </div>
+        <div>
+          <label>Day</label>
+          <input
+          type="number"
+          value={birthdate.day} onChange={(e) => setBirthdate({...birthdate, day: e.target.valueAsNumber})} />
+          <label>Month</label>
+          <input
+          type="number"
+          value={birthdate.month} onChange={(e) => setBirthdate({...birthdate, month: e.target.valueAsNumber})} />
+          <label>Year</label>
+          <input
+          type="number"
+          value={birthdate.year} onChange={(e) => setBirthdate({...birthdate, year: e.target.valueAsNumber})} />
+        </div>
+        <div>
+          <input
+          type="radio"
+          value="FitnessCategory"
+          checked={fitnessType === "FitnessCategory"}
+          onChange={() => setFitnessType("FitnessCategory")}
+          /> Category
+          <input
+          type="radio"
+          value="EnergyExpenditure"
+          checked={fitnessType === "EnergyExpenditure"}
+          onChange={() => setFitnessType("EnergyExpenditure")}
+          /> Daily Expenditure
+          {fitnessType === "FitnessCategory" ? (
+            <>
+              <label>Fitness Level</label>
+              <select value={fitnessLevel.type === "FitnessCategory" ? fitnessLevel.category: "sedentary"} onChange={(e) => setFitnessLevel({ type: "FitnessCategory", category: e.target.value as "sedentary" | "moderately active" | "active" | "very active"})}>
+                <option value="sedentary">sedentary</option>
+                <option value="moderately active">moderately active</option>
+                <option value="active">active</option>
+                <option value="very active">very active</option>
+              </select>
+            </>
+          ) : (
+            <>
+              <label>Daily Expenditure (kcal)</label>
+              <input 
+              type="number"
+              value={fitnessLevel.type === "EnergyExpenditure" ? fitnessLevel.daily_expenditure_calories : 0}
+              onChange={(e) => setFitnessLevel({ type: "EnergyExpenditure", daily_expenditure_calories: e.target.valueAsNumber })} />
+            </>
+          )}
+           </div>
+        <button type="submit">Save</button><button onClick={() => setIsEditing(false)}>Cancel</button>
+      </form> : <> <p>Name: {physicalInfo.name}</p>
       <p>Sex: {physicalInfo.sex}</p>
       <p>Height: {physicalInfo.height} cm</p>
       <p>
@@ -99,7 +199,9 @@ function PhysicalInfo({
         {physicalInfo.fitness_level.type === "FitnessCategory"
           ? physicalInfo.fitness_level.category
           : physicalInfo.fitness_level.daily_expenditure_calories + " kcal/day"}
-      </p>
+      </p> 
+      <button onClick={() => setIsEditing(true)}>Edit</button>
+      </>}
       <p>
         Latest weight:{" "}
         {lastWeight !== undefined ? lastWeight.weight / 1000 + " kg" : "N/A"}
@@ -374,7 +476,7 @@ function App() {
   function deleteFood(i: number): void {
     setDatabase({
       ...database,
-      foods: database.foods.filter((food, index) => index !== i)
+      foods: database.foods.filter((_, index) => index !== i)
     });
   }
 
@@ -437,7 +539,7 @@ function viewTab(
     case "PhysicalInfo":
       return (
         <>
-          <PhysicalInfo physicalInfo={database.physicalInfo} />
+          <PhysicalInfo physicalInfo={database.physicalInfo} setDatabase={setDatabase} database={database} />
           <hr />
           <EditPhysicalInfo database={database} setDatabase={setDatabase} />
         </>
