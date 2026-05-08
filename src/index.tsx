@@ -127,6 +127,7 @@ function handleAddWeight() {
   return (
     <>
       <h2>Physical Info</h2>
+      <button onClick={() => setIsEditing(true)}>Edit</button>
       {isEditing ? <form onSubmit={handleSave}>
         <div>
           <label>Name</label>
@@ -182,6 +183,7 @@ function handleAddWeight() {
           /> Daily Expenditure
           {fitnessType === "FitnessCategory" ? (
             <>
+            <br />
               <label>Fitness Level</label>
               <select value={fitnessLevel.type === "FitnessCategory" ? fitnessLevel.category: "sedentary"} onChange={(e) => setFitnessLevel({ type: "FitnessCategory", category: e.target.value as "sedentary" | "moderately active" | "active" | "very active"})}>
                 <option value="sedentary">sedentary</option>
@@ -192,6 +194,7 @@ function handleAddWeight() {
             </>
           ) : (
             <>
+              <br />
               <label>Daily Expenditure (kcal)</label>
               <input 
               type="number"
@@ -201,6 +204,8 @@ function handleAddWeight() {
           )}
            </div>
            <div>
+        <hr />
+        <label>Weight (kg)</label>
         <input
           name="weight"
           type="number"
@@ -228,7 +233,6 @@ function handleAddWeight() {
           ? physicalInfo.fitness_level.category
           : physicalInfo.fitness_level.daily_expenditure_calories + " kcal/day"}
       </p> 
-      <button onClick={() => setIsEditing(true)}>Edit</button>
       </>}
       <p>
         Latest weight:{" "}
