@@ -95,6 +95,7 @@ function PhysicalInfo({
     const [birthdate, setBirthdate] = useState(physicalInfo.birthdate);
     const [fitnessLevel, setFitnessLevel] = useState(physicalInfo.fitness_level);
     const [fitnessType, setFitnessType] = useState(physicalInfo.fitness_level.type);
+    const [weight, setWeight] = useState(0);
     function handleSave(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setDatabase({
@@ -110,6 +111,19 @@ function PhysicalInfo({
   });
   setIsEditing(false);
 }
+function handleAddWeight() {
+    setDatabase({
+      ...database,
+      physicalInfo: {
+        ...database.physicalInfo,
+        weight: [
+          ...database.physicalInfo.weight,
+          { weight, timestamp: Date.now() },
+        ],
+      },
+    });
+    setWeight(0);
+  }
   return (
     <>
       <h2>Physical Info</h2>
@@ -186,6 +200,20 @@ function PhysicalInfo({
             </>
           )}
            </div>
+           <div>
+        <input
+          name="weight"
+          type="number"
+          placeholder="Weight in grams"
+          required
+          value={weight}
+          onChange={(e) => {
+            const v = e.target.valueAsNumber;
+            if (!isNaN(v)) setWeight(v);
+          }}
+        />
+        </div>
+        <button type="button" onClick={handleAddWeight}>Add weight measurement</button>
         <button type="submit">Save</button><button onClick={() => setIsEditing(false)}>Cancel</button>
       </form> : <> <p>Name: {physicalInfo.name}</p>
       <p>Sex: {physicalInfo.sex}</p>
@@ -222,52 +250,6 @@ function PhysicalInfo({
           ))}
         </tbody>
       </table>
-    </>
-  );
-}
-
-function EditPhysicalInfo({
-  database,
-  setDatabase,
-}: {
-  database: Database;
-  setDatabase: SetDatabase;
-}) {
-  const [weight, setWeight] = useState(0);
-
-  function handleUpdatePhysicalInfo(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setDatabase({
-      ...database,
-      physicalInfo: {
-        ...database.physicalInfo,
-        weight: [
-          ...database.physicalInfo.weight,
-          { weight, timestamp: Date.now() },
-        ],
-      },
-    });
-    setWeight(0);
-  }
-
-  return (
-    <>
-      <h2>Edit Physical info</h2>
-      <form onSubmit={handleUpdatePhysicalInfo}>
-        <h3>Add new weight measurement</h3>
-        <input
-          name="weight"
-          type="number"
-          placeholder="Weight in grams"
-          required
-          value={weight}
-          onChange={(e) => {
-            const v = e.target.valueAsNumber;
-            if (!isNaN(v)) setWeight(v);
-          }}
-        />
-        <button type="submit">Add weight measurement</button>
-      </form>
     </>
   );
 }
@@ -540,8 +522,6 @@ function viewTab(
       return (
         <>
           <PhysicalInfo physicalInfo={database.physicalInfo} setDatabase={setDatabase} database={database} />
-          <hr />
-          <EditPhysicalInfo database={database} setDatabase={setDatabase} />
         </>
       );
     case "FoodItems":
