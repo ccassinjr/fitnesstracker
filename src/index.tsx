@@ -87,31 +87,33 @@ function PhysicalInfo({
   setDatabase: SetDatabase;
   database: Database;
 }): ReactElement {
-    const lastWeight = physicalInfo.weight[physicalInfo.weight.length - 1];
-    const [isEditing, setIsEditing] = useState(false);
-    const [name, setName] = useState(physicalInfo.name);
-    const [sex, setSex] = useState(physicalInfo.sex);
-    const [height, setHeight] = useState(physicalInfo.height);
-    const [birthdate, setBirthdate] = useState(physicalInfo.birthdate);
-    const [fitnessLevel, setFitnessLevel] = useState(physicalInfo.fitness_level);
-    const [fitnessType, setFitnessType] = useState(physicalInfo.fitness_level.type);
-    const [weight, setWeight] = useState(0);
-    function handleSave(e: FormEvent<HTMLFormElement>) {
+  const lastWeight = physicalInfo.weight[physicalInfo.weight.length - 1];
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState(physicalInfo.name);
+  const [sex, setSex] = useState(physicalInfo.sex);
+  const [height, setHeight] = useState(physicalInfo.height);
+  const [birthdate, setBirthdate] = useState(physicalInfo.birthdate);
+  const [fitnessLevel, setFitnessLevel] = useState(physicalInfo.fitness_level);
+  const [fitnessType, setFitnessType] = useState(
+    physicalInfo.fitness_level.type,
+  );
+  const [weight, setWeight] = useState(0);
+  function handleSave(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setDatabase({
       ...database,
       physicalInfo: {
         ...database.physicalInfo,
-            name: name,
-            sex: sex,
-            height: height,
-            birthdate: birthdate,
-            fitness_level: fitnessLevel
-    }
-  });
-  setIsEditing(false);
-}
-function handleAddWeight() {
+        name: name,
+        sex: sex,
+        height: height,
+        birthdate: birthdate,
+        fitness_level: fitnessLevel,
+      },
+    });
+    setIsEditing(false);
+  }
+  function handleAddWeight() {
     setDatabase({
       ...database,
       physicalInfo: {
@@ -128,112 +130,169 @@ function handleAddWeight() {
     <>
       <h2>Physical Info</h2>
       <button onClick={() => setIsEditing(true)}>Edit</button>
-      {isEditing ? <form onSubmit={handleSave}>
-        <div>
-          <label>Name</label>
-          <input
-          name="name"
-          type="text"
-          placeholder="Your name"
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}/>
-        </div>
-        <div>
-          <label>Sex</label>
-          <select value={sex} onChange={(e) => setSex(e.target.value as "male" | "female" | "other")}>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div>
-          <label>Height (cm)</label>
-          <input 
-          type="number"
-          value={height}
-          onChange={(e) => setHeight(e.target.valueAsNumber)} />
-        </div>
-        <div>
-          <label>Day</label>
-          <input
-          type="number"
-          value={birthdate.day} onChange={(e) => setBirthdate({...birthdate, day: e.target.valueAsNumber})} />
-          <label>Month</label>
-          <input
-          type="number"
-          value={birthdate.month} onChange={(e) => setBirthdate({...birthdate, month: e.target.valueAsNumber})} />
-          <label>Year</label>
-          <input
-          type="number"
-          value={birthdate.year} onChange={(e) => setBirthdate({...birthdate, year: e.target.valueAsNumber})} />
-        </div>
-        <div>
-          <input
-          type="radio"
-          value="FitnessCategory"
-          checked={fitnessType === "FitnessCategory"}
-          onChange={() => setFitnessType("FitnessCategory")}
-          /> Category
-          <input
-          type="radio"
-          value="EnergyExpenditure"
-          checked={fitnessType === "EnergyExpenditure"}
-          onChange={() => setFitnessType("EnergyExpenditure")}
-          /> Daily Expenditure
-          {fitnessType === "FitnessCategory" ? (
-            <>
-            <br />
-              <label>Fitness Level</label>
-              <select value={fitnessLevel.type === "FitnessCategory" ? fitnessLevel.category: "sedentary"} onChange={(e) => setFitnessLevel({ type: "FitnessCategory", category: e.target.value as "sedentary" | "moderately active" | "active" | "very active"})}>
-                <option value="sedentary">sedentary</option>
-                <option value="moderately active">moderately active</option>
-                <option value="active">active</option>
-                <option value="very active">very active</option>
-              </select>
-            </>
-          ) : (
-            <>
-              <br />
-              <label>Daily Expenditure (kcal)</label>
-              <input 
+      {isEditing ? (
+        <form onSubmit={handleSave}>
+          <div>
+            <label>Name</label>
+            <input
+              name="name"
+              type="text"
+              placeholder="Your name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label>Sex</label>
+            <select
+              value={sex}
+              onChange={(e) =>
+                setSex(e.target.value as "male" | "female" | "other")
+              }
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label>Height (cm)</label>
+            <input
               type="number"
-              value={fitnessLevel.type === "EnergyExpenditure" ? fitnessLevel.daily_expenditure_calories : 0}
-              onChange={(e) => setFitnessLevel({ type: "EnergyExpenditure", daily_expenditure_calories: e.target.valueAsNumber })} />
-            </>
-          )}
-           </div>
-           <div>
-        <hr />
-        <label>Weight (kg)</label>
-        <input
-          name="weight"
-          type="number"
-          placeholder="Weight in grams"
-          required
-          value={weight}
-          onChange={(e) => {
-            const v = e.target.valueAsNumber;
-            if (!isNaN(v)) setWeight(v);
-          }}
-        />
-        </div>
-        <button type="button" onClick={handleAddWeight}>Add weight measurement</button>
-        <button type="submit">Save</button><button onClick={() => setIsEditing(false)}>Cancel</button>
-      </form> : <> <p>Name: {physicalInfo.name}</p>
-      <p>Sex: {physicalInfo.sex}</p>
-      <p>Height: {physicalInfo.height} cm</p>
-      <p>
-        Birthdate: {physicalInfo.birthdate.day}/{physicalInfo.birthdate.month}/
-        {physicalInfo.birthdate.year}
-      </p>
-      <p>
-        Fitness level:{" "}
-        {physicalInfo.fitness_level.type === "FitnessCategory"
-          ? physicalInfo.fitness_level.category
-          : physicalInfo.fitness_level.daily_expenditure_calories + " kcal/day"}
-      </p> 
-      </>}
+              value={height}
+              onChange={(e) => setHeight(e.target.valueAsNumber)}
+            />
+          </div>
+          <div>
+            <label>Day</label>
+            <input
+              type="number"
+              value={birthdate.day}
+              onChange={(e) =>
+                setBirthdate({ ...birthdate, day: e.target.valueAsNumber })
+              }
+            />
+            <label>Month</label>
+            <input
+              type="number"
+              value={birthdate.month}
+              onChange={(e) =>
+                setBirthdate({ ...birthdate, month: e.target.valueAsNumber })
+              }
+            />
+            <label>Year</label>
+            <input
+              type="number"
+              value={birthdate.year}
+              onChange={(e) =>
+                setBirthdate({ ...birthdate, year: e.target.valueAsNumber })
+              }
+            />
+          </div>
+          <div>
+            <input
+              type="radio"
+              value="FitnessCategory"
+              checked={fitnessType === "FitnessCategory"}
+              onChange={() => setFitnessType("FitnessCategory")}
+            />{" "}
+            Category
+            <input
+              type="radio"
+              value="EnergyExpenditure"
+              checked={fitnessType === "EnergyExpenditure"}
+              onChange={() => setFitnessType("EnergyExpenditure")}
+            />{" "}
+            Daily Expenditure
+            {fitnessType === "FitnessCategory" ? (
+              <>
+                <br />
+                <label>Fitness Level</label>
+                <select
+                  value={
+                    fitnessLevel.type === "FitnessCategory"
+                      ? fitnessLevel.category
+                      : "sedentary"
+                  }
+                  onChange={(e) =>
+                    setFitnessLevel({
+                      type: "FitnessCategory",
+                      category: e.target.value as
+                        | "sedentary"
+                        | "moderately active"
+                        | "active"
+                        | "very active",
+                    })
+                  }
+                >
+                  <option value="sedentary">sedentary</option>
+                  <option value="moderately active">moderately active</option>
+                  <option value="active">active</option>
+                  <option value="very active">very active</option>
+                </select>
+              </>
+            ) : (
+              <>
+                <br />
+                <label>Daily Expenditure (kcal)</label>
+                <input
+                  type="number"
+                  value={
+                    fitnessLevel.type === "EnergyExpenditure"
+                      ? fitnessLevel.daily_expenditure_calories
+                      : 0
+                  }
+                  onChange={(e) =>
+                    setFitnessLevel({
+                      type: "EnergyExpenditure",
+                      daily_expenditure_calories: e.target.valueAsNumber,
+                    })
+                  }
+                />
+              </>
+            )}
+          </div>
+          <div>
+            <hr />
+            <label>Weight (kg)</label>
+            <input
+              name="weight"
+              type="number"
+              placeholder="Weight in grams"
+              required
+              value={weight}
+              onChange={(e) => {
+                const v = e.target.valueAsNumber;
+                if (!isNaN(v)) setWeight(v);
+              }}
+            />
+          </div>
+          <button type="button" onClick={handleAddWeight}>
+            Add weight measurement
+          </button>
+          <button type="submit">Save</button>
+          <button onClick={() => setIsEditing(false)}>Cancel</button>
+        </form>
+      ) : (
+        <>
+          {" "}
+          <p>Name: {physicalInfo.name}</p>
+          <p>Sex: {physicalInfo.sex}</p>
+          <p>Height: {physicalInfo.height} cm</p>
+          <p>
+            Birthdate: {physicalInfo.birthdate.day}/
+            {physicalInfo.birthdate.month}/{physicalInfo.birthdate.year}
+          </p>
+          <p>
+            Fitness level:{" "}
+            {physicalInfo.fitness_level.type === "FitnessCategory"
+              ? physicalInfo.fitness_level.category
+              : physicalInfo.fitness_level.daily_expenditure_calories +
+                " kcal/day"}
+          </p>
+        </>
+      )}
       <p>
         Latest weight:{" "}
         {lastWeight !== undefined ? lastWeight.weight / 1000 + " kg" : "N/A"}
@@ -324,56 +383,62 @@ function AddFoodItem({
           />
         </div>
         <div>
-        <label>Carbs</label>
-        <input
-          name="carbs"
-          type="number"
-          placeholder="carbs"
-          required
-          value={carbs}
-          onChange={(e) => {
-            const v = e.target.valueAsNumber;
-            if (!isNaN(v)) setCarbs(v);
-          }}
-        />
+          <label>Carbs</label>
+          <input
+            name="carbs"
+            type="number"
+            placeholder="carbs"
+            required
+            value={carbs}
+            onChange={(e) => {
+              const v = e.target.valueAsNumber;
+              if (!isNaN(v)) setCarbs(v);
+            }}
+          />
         </div>
         <div>
-        <label>Protein</label>
-        <input
-          name="protein"
-          type="number"
-          placeholder="protein"
-          required
-          value={protein}
-          onChange={(e) => {
-            const v = e.target.valueAsNumber;
-            if (!isNaN(v)) setProtein(v);
-          }}
-        />
+          <label>Protein</label>
+          <input
+            name="protein"
+            type="number"
+            placeholder="protein"
+            required
+            value={protein}
+            onChange={(e) => {
+              const v = e.target.valueAsNumber;
+              if (!isNaN(v)) setProtein(v);
+            }}
+          />
         </div>
         <div>
-        <label>Fat</label>
-        <input
-          name="fat"
-          type="number"
-          placeholder="fat"
-          required
-          value={fat}
-          onChange={(e) => {
-            const v = e.target.valueAsNumber;
-            if (!isNaN(v)) setFat(v);
-          }}
-        />
+          <label>Fat</label>
+          <input
+            name="fat"
+            type="number"
+            placeholder="fat"
+            required
+            value={fat}
+            onChange={(e) => {
+              const v = e.target.valueAsNumber;
+              if (!isNaN(v)) setFat(v);
+            }}
+          />
         </div>
         <div>
-        <button type="submit">Add food item</button>
+          <button type="submit">Add food item</button>
         </div>
       </form>
     </>
   );
 }
 
-function FoodList({ foods, onDeleteFood }: { foods: Array<FoodItem>, onDeleteFood: (i: number) => void}) {
+function FoodList({
+  foods,
+  onDeleteFood,
+}: {
+  foods: Array<FoodItem>;
+  onDeleteFood: (i: number) => void;
+}) {
   return (
     <>
       <h2>Food List</h2>
@@ -395,7 +460,9 @@ function FoodList({ foods, onDeleteFood }: { foods: Array<FoodItem>, onDeleteFoo
               <td>{food.carbs}</td>
               <td>{food.protein}</td>
               <td>{food.fat}</td>
-              <td><button onClick={() => onDeleteFood(i)}>Delete</button></td>
+              <td>
+                <button onClick={() => onDeleteFood(i)}>Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -462,7 +529,7 @@ function App() {
   function deleteFood(i: number): void {
     setDatabase({
       ...database,
-      foods: database.foods.filter((_, index) => index !== i)
+      foods: database.foods.filter((_, index) => index !== i),
     });
   }
 
@@ -470,13 +537,17 @@ function App() {
     <>
       <div>
         <h1>Fitness Tracker</h1>
-        <button onClick={() => { 
-        setDatabase(initialDatabase); 
-        setHasReset(true);
-        setTimeout(() => {
-          setHasReset(false);
-          }, 3000);}}
-        >Reset</button>
+        <button
+          onClick={() => {
+            setDatabase(initialDatabase);
+            setHasReset(true);
+            setTimeout(() => {
+              setHasReset(false);
+            }, 3000);
+          }}
+        >
+          Reset
+        </button>
         {hasReset ? <p>Database has been reset!</p> : null}
       </div>
       <ul className="home-tabs">
@@ -525,7 +596,11 @@ function viewTab(
     case "PhysicalInfo":
       return (
         <>
-          <PhysicalInfo physicalInfo={database.physicalInfo} setDatabase={setDatabase} database={database} />
+          <PhysicalInfo
+            physicalInfo={database.physicalInfo}
+            setDatabase={setDatabase}
+            database={database}
+          />
         </>
       );
     case "FoodItems":
