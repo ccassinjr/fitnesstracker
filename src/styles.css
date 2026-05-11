@@ -19,6 +19,13 @@
   --text-xl: 1.375rem;
   --text-2xl: 1.75rem;
 
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
   --nav-height: 3.5rem;
   --max-width: 48rem;
 
@@ -85,4 +92,82 @@ select,
 button {
   font-family: var(--font-body);
   font-size: var(--text-sm);
+}
+
+.app {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+.app__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  height: var(--nav-height);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-lg);
+}
+
+.app__title {
+  font-size: var(--text-2xl);
+  color: var(--accent);
+  flex: 1;
+}
+
+.app__reset {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.app__reset:hover {
+  border-color: var(--muted);
+  color: var(--text);
+}
+
+.app__reset-confirm {
+  font-size: var(--text-xs);
+  color: var(--accent);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-xs);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-xl);
+}
+
+.tabs__tab {
+  padding: var(--space-sm) var(--space-md);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition:
+    color var(--transition),
+    border color var(--transition);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.tabs__tab:hover {
+  color: var(--text);
+}
+
+.tabs__tab--active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.app__content {
+  padding-bottom: var(--space-2xl);
 }

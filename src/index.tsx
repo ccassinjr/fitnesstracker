@@ -535,51 +535,60 @@ function App() {
 
   return (
     <>
-      <div>
-        <h1>Fitness Tracker</h1>
-        <button
-          onClick={() => {
-            setDatabase(initialDatabase);
-            setHasReset(true);
-            setTimeout(() => {
-              setHasReset(false);
-            }, 3000);
-          }}
-        >
-          Reset
-        </button>
-        {hasReset ? <p>Database has been reset!</p> : null}
+      <div className="app">
+        <header className="app__header">
+          <h1 className="app__title">Fitness Tracker</h1>
+          <button
+            className="app__reset"
+            onClick={() => {
+              setDatabase(initialDatabase);
+              setHasReset(true);
+              setTimeout(() => {
+                setHasReset(false);
+              }, 3000);
+            }}
+          >
+            Reset
+          </button>
+          {hasReset ? (
+            <p className="app__reset-confirm">Database has been reset</p>
+          ) : null}
+        </header>
+        <nav className="app__nav">
+          <ul className="tabs">
+            <li
+              className={cn({
+                tabs__tab: true,
+                "tabs__tab--active": selectedTab === "Home",
+              })}
+              onClick={() => setSelectedTab("Home")}
+            >
+              Home
+            </li>
+            <li
+              className={cn({
+                tabs__tab: true,
+                "tabs__tab--active": selectedTab === "PhysicalInfo",
+              })}
+              onClick={() => setSelectedTab("PhysicalInfo")}
+            >
+              Physical Info
+            </li>
+            <li
+              className={cn({
+                tabs__tab: true,
+                "tabs__tab--active": selectedTab === "FoodItems",
+              })}
+              onClick={() => setSelectedTab("FoodItems")}
+            >
+              Food Items
+            </li>
+          </ul>
+        </nav>
+        <main className="app__content">
+          {viewTab(selectedTab, database, setDatabase, deleteFood)}
+        </main>
       </div>
-      <ul className="home-tabs">
-        <li
-          className={cn({
-            "home-tabs-tab": true,
-            active: selectedTab === "Home",
-          })}
-          onClick={() => setSelectedTab("Home")}
-        >
-          Home
-        </li>
-        <li
-          className={cn({
-            "home-tabs-tab": true,
-            active: selectedTab === "PhysicalInfo",
-          })}
-          onClick={() => setSelectedTab("PhysicalInfo")}
-        >
-          Physical Info
-        </li>
-        <li
-          className={cn({
-            "home-tabs-tab": true,
-            active: selectedTab === "FoodItems",
-          })}
-          onClick={() => setSelectedTab("FoodItems")}
-        >
-          Food Items
-        </li>
-      </ul>
-      {viewTab(selectedTab, database, setDatabase, deleteFood)}
     </>
   );
 }
