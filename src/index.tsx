@@ -127,9 +127,9 @@ function PhysicalInfo({
     setWeight(0);
   }
   return (
-    <section className="physical-info">
-      <div className="physical-info__header">
-        <h2 className="physical-info__title">Physical Information</h2>
+    <section className="section physical-info">
+      <div className="section__header">
+        <h2 className="section__title">Physical Information</h2>
         {!isEditing && (
           <button
             className="physical-info__edit-btn"
