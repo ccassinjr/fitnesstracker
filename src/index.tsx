@@ -127,14 +127,24 @@ function PhysicalInfo({
     setWeight(0);
   }
   return (
-    <>
-      <h2>Physical Info</h2>
-      <button onClick={() => setIsEditing(true)}>Edit</button>
+    <section className="physical-info">
+      <div className="physical-info__header">
+        <h2 className="physical-info__title">Physical Information</h2>
+        {!isEditing && (
+          <button
+            className="physical-info__edit-btn"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit
+          </button>
+        )}
+      </div>
       {isEditing ? (
-        <form onSubmit={handleSave}>
-          <div>
-            <label>Name</label>
+        <form className="physical-info__form" onSubmit={handleSave}>
+          <div className="physical-info__field">
+            <label className="physical-info__label">Name</label>
             <input
+              className="physical-info__input"
               name="name"
               type="text"
               placeholder="Your name"
@@ -143,9 +153,10 @@ function PhysicalInfo({
               onChange={(e) => setName(e.target.value)}
             />
           </div>
-          <div>
-            <label>Sex</label>
+          <div className="physical-info__field">
+            <label className="physical-info__label">Sex</label>
             <select
+              className="physical-info__select"
               value={sex}
               onChange={(e) =>
                 setSex(e.target.value as "male" | "female" | "other")
@@ -156,60 +167,90 @@ function PhysicalInfo({
               <option value="other">Other</option>
             </select>
           </div>
-          <div>
-            <label>Height (cm)</label>
+          <div className="physical-info__field">
+            <label className="physical-info__label">Height (cm)</label>
             <input
+              className="physical-info__input"
               type="number"
               value={height}
               onChange={(e) => setHeight(e.target.valueAsNumber)}
             />
           </div>
-          <div>
-            <label>Day</label>
-            <input
-              type="number"
-              value={birthdate.day}
-              onChange={(e) =>
-                setBirthdate({ ...birthdate, day: e.target.valueAsNumber })
-              }
-            />
-            <label>Month</label>
-            <input
-              type="number"
-              value={birthdate.month}
-              onChange={(e) =>
-                setBirthdate({ ...birthdate, month: e.target.valueAsNumber })
-              }
-            />
-            <label>Year</label>
-            <input
-              type="number"
-              value={birthdate.year}
-              onChange={(e) =>
-                setBirthdate({ ...birthdate, year: e.target.valueAsNumber })
-              }
-            />
+
+          <div className="physical-info__field">
+            <span className="physical-info__label">Date of birth</span>
+            <div className="physical-info__dob-group">
+              <div className="physical-info__dob-field">
+                <label className="physical-info__dob-label">Day</label>
+                <input
+                  className="physical-info__input physical-info__input--dob"
+                  type="number"
+                  value={birthdate.day}
+                  onChange={(e) =>
+                    setBirthdate({ ...birthdate, day: e.target.valueAsNumber })
+                  }
+                />
+              </div>
+              <div className="physical-info__dob-field">
+                <label className="physical-info__dob-label">Month</label>
+                <input
+                  className="physical-info__input physical-info__input--dob"
+                  type="number"
+                  value={birthdate.month}
+                  onChange={(e) =>
+                    setBirthdate({
+                      ...birthdate,
+                      month: e.target.valueAsNumber,
+                    })
+                  }
+                />
+              </div>
+              <div className="physical-info__dob-field">
+                <label className="physical-info__dob-label">Year</label>
+                <input
+                  className="physical-info__input physical-info__input--dob"
+                  type="number"
+                  value={birthdate.year}
+                  onChange={(e) =>
+                    setBirthdate({ ...birthdate, year: e.target.valueAsNumber })
+                  }
+                />
+              </div>
+            </div>
           </div>
-          <div>
-            <input
-              type="radio"
-              value="FitnessCategory"
-              checked={fitnessType === "FitnessCategory"}
-              onChange={() => setFitnessType("FitnessCategory")}
-            />{" "}
-            Category
-            <input
-              type="radio"
-              value="EnergyExpenditure"
-              checked={fitnessType === "EnergyExpenditure"}
-              onChange={() => setFitnessType("EnergyExpenditure")}
-            />{" "}
-            Daily Expenditure
+
+          <div className="physical-info__field">
+            <span className="physical-info__label">Activity level</span>
+            <div className="physical-info__radio-group">
+              <label className="physical-info__radio-label">
+                <input
+                  className="physical-info__radio"
+                  type="radio"
+                  value="FitnessCategory"
+                  checked={fitnessType === "FitnessCategory"}
+                  onChange={() => setFitnessType("FitnessCategory")}
+                />
+                Category
+              </label>
+              <label className="physical-info__radio-label">
+                <input
+                  className="physical-info__radio"
+                  type="radio"
+                  value="EnergyExpenditure"
+                  checked={fitnessType === "EnergyExpenditure"}
+                  onChange={() => setFitnessType("EnergyExpenditure")}
+                />
+                Daily energy expenditure
+              </label>
+            </div>
+
             {fitnessType === "FitnessCategory" ? (
-              <>
-                <br />
-                <label>Fitness Level</label>
+              <div className="physical-info__field physical-info__field--nested">
+                <label className="physical-info__label">
+                  Activity category
+                </label>
                 <select
+                  className="physical-info__select"
                   value={
                     fitnessLevel.type === "FitnessCategory"
                       ? fitnessLevel.category
@@ -226,17 +267,19 @@ function PhysicalInfo({
                     })
                   }
                 >
-                  <option value="sedentary">sedentary</option>
-                  <option value="moderately active">moderately active</option>
-                  <option value="active">active</option>
-                  <option value="very active">very active</option>
+                  <option value="sedentary">Sedentary</option>
+                  <option value="moderately active">Moderately active</option>
+                  <option value="active">Active</option>
+                  <option value="very active">Very active</option>
                 </select>
-              </>
+              </div>
             ) : (
-              <>
-                <br />
-                <label>Daily Expenditure (kcal)</label>
+              <div className="physical-info__field physical-info__field--nested">
+                <label className="physical-info__label">
+                  Calories burned per day (kcal)
+                </label>
                 <input
+                  className="physical-info__input"
                   type="number"
                   value={
                     fitnessLevel.type === "EnergyExpenditure"
@@ -250,17 +293,18 @@ function PhysicalInfo({
                     })
                   }
                 />
-              </>
+              </div>
             )}
           </div>
-          <div>
-            <hr />
-            <label>Weight (kg)</label>
+
+          <div className="physical-info__divider" />
+          <div className="physical-info__field">
+            <label className="physical-info__label">Weight (kg)</label>
             <input
+              className="physical-info__input"
               name="weight"
               type="number"
-              placeholder="Weight in grams"
-              required
+              placeholder="e.g. 82.5"
               value={weight}
               onChange={(e) => {
                 const v = e.target.valueAsNumber;
@@ -268,52 +312,100 @@ function PhysicalInfo({
               }}
             />
           </div>
-          <button type="button" onClick={handleAddWeight}>
-            Add weight measurement
+
+          <button
+            className="physical-info__btn physical-info__btn--secondary"
+            type="button"
+            onClick={handleAddWeight}
+          >
+            Log weight
           </button>
-          <button type="submit">Save</button>
-          <button onClick={() => setIsEditing(false)}>Cancel</button>
+
+          <div className="physical-info__actions">
+            <button
+              className="physical-info__btn physical-info__btn--primary"
+              type="submit"
+            >
+              Save changes
+            </button>
+            <button
+              className="physical-info__btn physical-info__btn--ghost"
+              onClick={() => setIsEditing(false)}
+              type="button"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       ) : (
-        <>
-          {" "}
-          <p>Name: {physicalInfo.name}</p>
-          <p>Sex: {physicalInfo.sex}</p>
-          <p>Height: {physicalInfo.height} cm</p>
-          <p>
-            Birthdate: {physicalInfo.birthdate.day}/
-            {physicalInfo.birthdate.month}/{physicalInfo.birthdate.year}
-          </p>
-          <p>
-            Fitness level:{" "}
-            {physicalInfo.fitness_level.type === "FitnessCategory"
-              ? physicalInfo.fitness_level.category
-              : physicalInfo.fitness_level.daily_expenditure_calories +
-                " kcal/day"}
-          </p>
-        </>
+        <div className="physical-info__display">
+          <dl className="physical-info__stats">
+            <div className="physical-info__stat">
+              <dt className="physical-info__stat-label">Name</dt>
+              <dd className="physical-info__stat-value">{physicalInfo.name}</dd>
+            </div>
+            <div className="physical-info__stat">
+              <dt className="physical-info__stat-label">Sex</dt>
+              <dd className="physical-info__stat-value">{physicalInfo.sex}</dd>
+            </div>
+            <div className="physical-info__stat">
+              <dt className="physical-info__stat-label">Height</dt>
+              <dd className="physical-info__stat-value">
+                {physicalInfo.height} cm
+              </dd>
+            </div>
+            <div className="physical-info__stat">
+              <dt className="physical-info__stat-label">Date of birth</dt>
+              <dd className="physical-info__stat-value">
+                {physicalInfo.birthdate.day}/{physicalInfo.birthdate.month}/
+                {physicalInfo.birthdate.year}
+              </dd>
+            </div>
+            <div className="physical-info__stat">
+              <dt className="physical-info__stat-label">Activity level</dt>
+              <dd className="physical-info__stat-value">
+                {physicalInfo.fitness_level.type === "FitnessCategory"
+                  ? physicalInfo.fitness_level.category
+                  : `${physicalInfo.fitness_level.daily_expenditure_calories} kcal/day`}
+              </dd>
+            </div>
+
+            <div className="physical-info__stat">
+              <dt className="physical-info__stat-label">Latest weight</dt>
+              <dd className="physical-info__stat-value">
+                {lastWeight !== undefined
+                  ? `${lastWeight.weight / 1000} kg`
+                  : "Not logged"}
+              </dd>
+            </div>
+          </dl>
+        </div>
       )}
-      <p>
-        Latest weight:{" "}
-        {lastWeight !== undefined ? lastWeight.weight / 1000 + " kg" : "N/A"}
-      </p>
-      <table>
-        <thead>
-          <tr>
-            <td>Weight</td>
-            <td>Date</td>
-          </tr>
-        </thead>
-        <tbody>
-          {physicalInfo.weight.map((entry, i) => (
-            <tr key={i}>
-              <td>{showWeight(entry.weight)}</td>
-              <td>{showTimestamp(entry.timestamp)}</td>
+
+      <div className="physical-info__weight-history">
+        <h3 className="physical-info__weight-history-title">Weight history</h3>
+        <table className="physical-info__table">
+          <thead className="physical-info__table-head">
+            <tr>
+              <th className="physical-info__table-header">Weight</th>
+              <th className="physical-info__table-header">Date</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </>
+          </thead>
+          <tbody className="physical-info__table-body">
+            {physicalInfo.weight.map((entry, i) => (
+              <tr className="physical-info__table-row" key={i}>
+                <td className="physical-info__table-cell">
+                  {showWeight(entry.weight)}
+                </td>
+                <td className="physical-info__table-cell">
+                  {showTimestamp(entry.timestamp)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 
