@@ -524,6 +524,27 @@ function AddFoodItem({
   );
 }
 
+function FoodListItem({
+  food,
+  onDelete,
+}: {
+  food: FoodItem;
+  onDelete: () => void;
+}): ReactElement {
+  return (
+    <tr>
+      <td>{food.name}</td>
+      <td>{food.calories_per_100g}</td>
+      <td>{food.carbs}</td>
+      <td>{food.protein}</td>
+      <td>{food.fat}</td>
+      <td>
+        <button onClick={() => onDelete()}>Delete</button>
+      </td>
+    </tr>
+  );
+}
+
 function FoodList({
   foods,
   onDeleteFood,
@@ -546,16 +567,11 @@ function FoodList({
         </thead>
         <tbody>
           {foods.map((food, i) => (
-            <tr key={i}>
-              <td>{food.name}</td>
-              <td>{food.calories_per_100g}</td>
-              <td>{food.carbs}</td>
-              <td>{food.protein}</td>
-              <td>{food.fat}</td>
-              <td>
-                <button onClick={() => onDeleteFood(i)}>Delete</button>
-              </td>
-            </tr>
+            <FoodListItem
+              key={i}
+              food={food}
+              onDelete={() => onDeleteFood(i)}
+            />
           ))}
         </tbody>
       </table>
