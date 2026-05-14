@@ -527,14 +527,16 @@ function AddFoodItem({
 
 function FoodListItem({
   food,
+  matchIndices,
   onDelete,
 }: {
   food: FoodItem;
+  matchIndices: Array<number>;
   onDelete: () => void;
 }): ReactElement {
   return (
     <tr>
-      <td>{food.name}</td>
+      <td>{highlightMatch(food.name, matchIndices)}</td>
       <td>{food.calories_per_100g}</td>
       <td>{food.carbs}</td>
       <td>{food.protein}</td>
@@ -546,6 +548,40 @@ function FoodListItem({
   );
 }
 
+function fuzzyMatch(query: string, target: string): Array<number> | null {
+  const q = query.toLowerCase();
+  const t = target.toLowerCase();
+  const indices: Array<number> = [];
+  let qi = 0;
+  for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+    if (t[ti] === q[qi]) {
+      indices.push(ti);
+      qi++;
+    }
+  }
+  return qi === q.length ? indices : null;
+}
+
+function highlightMatch(
+  name: string,
+  matchIndices: Array<number>,
+): ReactElement {
+  const indexSet = new Set(matchIndices);
+  return (
+    <>
+      {Array.from(name).map((ch, i) =>
+        indexSet.has(i) ? (
+          <strong key={i}>{ch}</strong>
+        ) : (
+          <span key={i}>{ch}</span>
+        ),
+      )}
+    </>
+  );
+}
+
+const FOOD_PAGE_SIZE = 15;
+
 function FoodList({
   foods,
   onDeleteFood,
@@ -553,9 +589,38 @@ function FoodList({
   foods: Array<FoodItem>;
   onDeleteFood: (i: number) => void;
 }) {
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(0);
+
+  const filteredFoods = foods
+    .map((food, originalIndex) => {
+      const matchIndices = fuzzyMatch(query, food.name);
+      return matchIndices === null
+        ? null
+        : { food, originalIndex, matchIndices };
+    })
+    .filter((entry) => entry !== null);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredFoods.length / FOOD_PAGE_SIZE),
+  );
+  const currentPage = Math.min(page, totalPages - 1);
+  const pageStart = currentPage * FOOD_PAGE_SIZE;
+  const pageItems = filteredFoods.slice(pageStart, pageStart + FOOD_PAGE_SIZE);
+
   return (
     <>
       <h2>Food List</h2>
+      <input
+        type="text"
+        placeholder="Filter foods..."
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setPage(0);
+        }}
+      />
       <table>
         <thead>
           <tr>
@@ -567,15 +632,37 @@ function FoodList({
           </tr>
         </thead>
         <tbody>
-          {foods.map((food, i) => (
+          {pageItems.map(({ food, originalIndex, matchIndices }) => (
             <FoodListItem
-              key={i}
+              key={originalIndex}
               food={food}
-              onDelete={() => onDeleteFood(i)}
+              matchIndices={matchIndices}
+              onDelete={() => onDeleteFood(originalIndex)}
             />
           ))}
         </tbody>
       </table>
+      <div>
+        <button
+          type="button"
+          onClick={() => setPage(currentPage - 1)}
+          disabled={currentPage === 0}
+        >
+          Previous
+        </button>
+        <span>
+          {" "}
+          Page {currentPage + 1} of {totalPages} ({filteredFoods.length}{" "}
+          items){" "}
+        </span>
+        <button
+          type="button"
+          onClick={() => setPage(currentPage + 1)}
+          disabled={currentPage >= totalPages - 1}
+        >
+          Next
+        </button>
+      </div>
     </>
   );
 }
