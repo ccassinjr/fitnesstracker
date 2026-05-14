@@ -5,6 +5,7 @@ import { foodDatabase } from "./food-database";
 type Database = {
   physicalInfo: PhysicalInfo;
   foods: Array<FoodItem>;
+  meals: Array<MealEntry>;
 };
 type Percentage = number;
 
@@ -21,6 +22,7 @@ type FitnessLevel =
 
 type DateT = { day: number; month: number; year: number };
 type Centimeters = number;
+type FoodId = number;
 
 type PhysicalInfo = {
   name: string;
@@ -41,12 +43,24 @@ type PortionAmount =
   | { type: "volume"; milliliters: Milliliters };
 
 export type FoodItem = {
+  id: FoodId;
   name: string;
   calories_per_100g: number;
   carbs: Percentage;
   protein: Percentage;
   fat: Percentage;
   common_portions: Array<FoodPortion>;
+};
+
+type MealEntry = {
+  type: "breakfast" | "lunch" | "dinner" | "snack";
+  foods: Array<MealFoodEntry>;
+  time: Timestamp;
+};
+
+type MealFoodEntry = {
+  food: FoodId;
+  quantity: PortionAmount;
 };
 
 const initialDatabase: Database = {
@@ -59,6 +73,7 @@ const initialDatabase: Database = {
     weight: [{ weight: 77000, timestamp: 1776016587021 }],
   },
   foods: foodDatabase,
+  meals: [],
 };
 
 // Convert an object of class names into a string.
@@ -430,6 +445,7 @@ function AddFoodItem({
       foods: [
         ...database.foods,
         {
+          id: Date.now(),
           name,
           calories_per_100g: caloriesPer100g,
           carbs,

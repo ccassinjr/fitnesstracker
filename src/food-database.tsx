@@ -1,7 +1,8 @@
 import foodData from "../food-data.json";
 import type { FoodItem } from "./index";
 
-export const foodDatabase: Array<FoodItem> = foodData.map((entry) => ({
+export const foodDatabase: Array<FoodItem> = foodData.map((entry, ix) => ({
+  id: ix,
   name: entry.food,
   calories_per_100g: entry["Caloric Value"],
   carbs: entry.Carbohydrates,
