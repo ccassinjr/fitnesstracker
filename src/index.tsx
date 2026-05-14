@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type ReactElement } from "react";
 import { createRoot } from "react-dom/client";
+import { foodDatabase } from "./food-database";
 
 type Database = {
   physicalInfo: PhysicalInfo;
@@ -39,7 +40,7 @@ type PortionAmount =
   | { type: "weight"; grams: Grams }
   | { type: "volume"; milliliters: Milliliters };
 
-type FoodItem = {
+export type FoodItem = {
   name: string;
   calories_per_100g: number;
   carbs: Percentage;
@@ -57,7 +58,7 @@ const initialDatabase: Database = {
     fitness_level: { type: "FitnessCategory", category: "moderately active" },
     weight: [{ weight: 77000, timestamp: 1776016587021 }],
   },
-  foods: [],
+  foods: foodDatabase,
 };
 
 // Convert an object of class names into a string.
