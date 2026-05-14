@@ -1,4 +1,9 @@
-import { useState, type FormEvent, type ReactElement } from "react";
+import {
+  useMemo,
+  useState,
+  type FormEvent,
+  type ReactElement,
+} from "react";
 import { createRoot } from "react-dom/client";
 import { foodDatabase } from "./food-database";
 
@@ -578,6 +583,32 @@ function fuzzyMatch(query: string, target: string): Array<number> | null {
   return qi === q.length ? indices : null;
 }
 
+// Higher score = better match. Rewards consecutive matches and matches at
+// the start of words; penalises gaps and longer targets.
+function fuzzyScore(indices: Array<number>, target: string): number {
+  const first = indices[0];
+  if (first === undefined) return 0;
+  let score = 0;
+  let lastIdx = -2;
+  for (const idx of indices) {
+    if (idx === lastIdx + 1) {
+      score += 5;
+    }
+    if (idx === 0) {
+      score += 10;
+    } else {
+      const prev = target[idx - 1];
+      if (prev === " " || prev === "-" || prev === "_") {
+        score += 5;
+      }
+    }
+    lastIdx = idx;
+  }
+  score -= first * 0.5;
+  score -= target.length * 0.05;
+  return score;
+}
+
 function highlightMatch(
   name: string,
   matchIndices: Array<number>,
@@ -715,7 +746,274 @@ function saveTab(tab: AppTabs): void {
   window.localStorage.setItem(TAB_KEY, JSON.stringify(tab));
 }
 
-type AppTabs = "Home" | "PhysicalInfo" | "FoodItems";
+type AppTabs = "Home" | "PhysicalInfo" | "FoodItems" | "Meals";
+
+type MealType = MealEntry["type"];
+
+const MEAL_TYPES: Array<MealType> = ["breakfast", "lunch", "dinner", "snack"];
+
+function showPortion(portion: PortionAmount): string {
+  if (portion.type === "weight") return showWeight(portion.grams);
+  return `${portion.milliliters} ml`;
+}
+
+function LogMeal({
+  database,
+  setDatabase,
+}: {
+  database: Database;
+  setDatabase: SetDatabase;
+}): ReactElement {
+  const [mealType, setMealType] = useState<MealType>("breakfast");
+  const [selectedFoods, setSelectedFoods] = useState<Array<MealFoodEntry>>([]);
+  const [query, setQuery] = useState("");
+  const [pendingFood, setPendingFood] = useState<FoodItem | null>(null);
+  const [pendingUnit, setPendingUnit] = useState<"weight" | "volume">("weight");
+  const [pendingAmount, setPendingAmount] = useState<number>(100);
+
+  const topResults = useMemo(() => {
+    if (query.trim() === "") return [];
+    const matches: Array<{
+      food: FoodItem;
+      indices: Array<number>;
+      score: number;
+    }> = [];
+    for (const food of database.foods) {
+      const indices = fuzzyMatch(query, food.name);
+      if (indices === null) continue;
+      matches.push({ food, indices, score: fuzzyScore(indices, food.name) });
+    }
+    matches.sort((a, b) => b.score - a.score);
+    return matches.slice(0, 5);
+  }, [query, database.foods]);
+
+  function startAddingFood(food: FoodItem) {
+    setPendingFood(food);
+    setPendingUnit("weight");
+    setPendingAmount(100);
+    setQuery("");
+  }
+
+  function confirmPendingFood() {
+    if (pendingFood === null) return;
+    if (!Number.isFinite(pendingAmount) || pendingAmount <= 0) return;
+    const quantity: PortionAmount =
+      pendingUnit === "weight"
+        ? { type: "weight", grams: pendingAmount }
+        : { type: "volume", milliliters: pendingAmount };
+    setSelectedFoods([
+      ...selectedFoods,
+      { food: pendingFood.id, quantity },
+    ]);
+    setPendingFood(null);
+  }
+
+  function cancelPendingFood() {
+    setPendingFood(null);
+  }
+
+  function removeFood(idx: number) {
+    setSelectedFoods(selectedFoods.filter((_, i) => i !== idx));
+  }
+
+  function handleLogMeal(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (selectedFoods.length === 0) return;
+    setDatabase({
+      ...database,
+      meals: [
+        ...database.meals,
+        {
+          type: mealType,
+          foods: selectedFoods,
+          time: Date.now(),
+        },
+      ],
+    });
+    setSelectedFoods([]);
+    setQuery("");
+    setPendingFood(null);
+    setMealType("breakfast");
+  }
+
+  const pendingAmountValid =
+    Number.isFinite(pendingAmount) && pendingAmount > 0;
+
+  return (
+    <>
+      <h2>Log Meal</h2>
+      <form onSubmit={handleLogMeal}>
+        <div>
+          <label>Meal type</label>
+          <select
+            value={mealType}
+            onChange={(e) => setMealType(e.target.value as MealType)}
+          >
+            {MEAL_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label>Foods</label>
+          {selectedFoods.length === 0 ? (
+            <p>No foods selected yet.</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <td>Name</td>
+                  <td>Quantity</td>
+                  <td>Calories per 100g</td>
+                  <td>Carbs</td>
+                  <td>Protein</td>
+                  <td>Fat</td>
+                  <td></td>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedFoods.map((entry, i) => {
+                  const food = database.foods.find((f) => f.id === entry.food);
+                  if (food === undefined) {
+                    return (
+                      <tr key={i}>
+                        <td>(unknown food)</td>
+                        <td>{showPortion(entry.quantity)}</td>
+                        <td colSpan={4}></td>
+                        <td>
+                          <button type="button" onClick={() => removeFood(i)}>
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  }
+                  return (
+                    <tr key={i}>
+                      <td>{food.name}</td>
+                      <td>{showPortion(entry.quantity)}</td>
+                      <td>{food.calories_per_100g}</td>
+                      <td>{food.carbs}</td>
+                      <td>{food.protein}</td>
+                      <td>{food.fat}</td>
+                      <td>
+                        <button type="button" onClick={() => removeFood(i)}>
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        <div>
+          <label>Add food</label>
+          {pendingFood === null ? (
+            <>
+              <input
+                type="text"
+                placeholder="Search foods..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              {query.trim() !== "" && (
+                <ul>
+                  {topResults.length === 0 ? (
+                    <li>No matches</li>
+                  ) : (
+                    topResults.map(({ food, indices }) => (
+                      <li key={food.id}>
+                        <button
+                          type="button"
+                          onClick={() => startAddingFood(food)}
+                        >
+                          {highlightMatch(food.name, indices)}
+                        </button>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              )}
+            </>
+          ) : (
+            <div>
+              <p>
+                Selected: <strong>{pendingFood.name}</strong>
+              </p>
+              <label>Amount</label>
+              <input
+                type="number"
+                min="0"
+                step="any"
+                value={pendingAmount}
+                onChange={(e) => setPendingAmount(e.target.valueAsNumber)}
+              />
+              <select
+                value={pendingUnit}
+                onChange={(e) =>
+                  setPendingUnit(e.target.value as "weight" | "volume")
+                }
+              >
+                <option value="weight">grams</option>
+                <option value="volume">milliliters</option>
+              </select>
+              <button
+                type="button"
+                onClick={confirmPendingFood}
+                disabled={!pendingAmountValid}
+              >
+                Add
+              </button>
+              <button type="button" onClick={cancelPendingFood}>
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div>
+          <button type="submit" disabled={selectedFoods.length === 0}>
+            Log meal
+          </button>
+        </div>
+      </form>
+    </>
+  );
+}
+
+function MealLog({ database }: { database: Database }): ReactElement {
+  if (database.meals.length === 0) {
+    return <p>No meals logged yet.</p>;
+  }
+  const foodById = new Map(database.foods.map((f) => [f.id, f]));
+  return (
+    <>
+      <h2>Logged Meals</h2>
+      <ul>
+        {database.meals
+          .slice()
+          .reverse()
+          .map((meal, i) => (
+            <li key={i}>
+              <strong>{meal.type}</strong> — {showTimestamp(meal.time)}
+              <ul>
+                {meal.foods.map((mfe, j) => {
+                  const food = foodById.get(mfe.food);
+                  return <li key={j}>{food?.name ?? "(unknown food)"}</li>;
+                })}
+              </ul>
+            </li>
+          ))}
+      </ul>
+    </>
+  );
+}
 
 type SetDatabase = (db: Database) => void;
 
@@ -795,6 +1093,15 @@ function App() {
             >
               Food Items
             </li>
+            <li
+              className={cn({
+                tabs__tab: true,
+                "tabs__tab--active": selectedTab === "Meals",
+              })}
+              onClick={() => setSelectedTab("Meals")}
+            >
+              Meals
+            </li>
           </ul>
         </nav>
         <main className="app__content">
@@ -830,6 +1137,14 @@ function viewTab(
           <FoodList foods={database.foods} onDeleteFood={deleteFood} />
           <hr />
           <AddFoodItem database={database} setDatabase={setDatabase} />
+        </>
+      );
+    case "Meals":
+      return (
+        <>
+          <LogMeal database={database} setDatabase={setDatabase} />
+          <hr />
+          <MealLog database={database} />
         </>
       );
     default:
