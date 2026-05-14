@@ -757,6 +757,17 @@ function showPortion(portion: PortionAmount): string {
   return `${portion.milliliters} ml`;
 }
 
+function showTotalQuantity(grams: number, milliliters: number): string {
+  const parts: Array<string> = [];
+  if (grams > 0) parts.push(showWeight(grams));
+  if (milliliters > 0) parts.push(`${milliliters} ml`);
+  return parts.length === 0 ? "0 g" : parts.join(" + ");
+}
+
+function formatTotal(n: number): string {
+  return (Math.round(n * 10) / 10).toString();
+}
+
 function LogMeal({
   database,
   setDatabase,
@@ -786,6 +797,40 @@ function LogMeal({
     matches.sort((a, b) => b.score - a.score);
     return matches.slice(0, 5);
   }, [query, database.foods]);
+
+  const foodById = useMemo(
+    () => new Map(database.foods.map((f) => [f.id, f])),
+    [database.foods],
+  );
+
+  // Totals are computed from the chosen portions (not the raw per-100g
+  // column values), so the row shows the real meal calories and macro
+  // grams. Volume entries don't contribute to nutritional totals because
+  // we have no density to convert ml to grams.
+  const totals = useMemo(() => {
+    let grams = 0;
+    let milliliters = 0;
+    let calories = 0;
+    let carbs = 0;
+    let protein = 0;
+    let fat = 0;
+    for (const entry of selectedFoods) {
+      const food = foodById.get(entry.food);
+      if (entry.quantity.type === "volume") {
+        milliliters += entry.quantity.milliliters;
+        continue;
+      }
+      const g = entry.quantity.grams;
+      grams += g;
+      if (food === undefined) continue;
+      const factor = g / 100;
+      calories += food.calories_per_100g * factor;
+      carbs += food.carbs * factor;
+      protein += food.protein * factor;
+      fat += food.fat * factor;
+    }
+    return { grams, milliliters, calories, carbs, protein, fat };
+  }, [selectedFoods, foodById]);
 
   function startAddingFood(food: FoodItem) {
     setPendingFood(food);
@@ -876,7 +921,7 @@ function LogMeal({
               </thead>
               <tbody>
                 {selectedFoods.map((entry, i) => {
-                  const food = database.foods.find((f) => f.id === entry.food);
+                  const food = foodById.get(entry.food);
                   if (food === undefined) {
                     return (
                       <tr key={i}>
@@ -908,6 +953,17 @@ function LogMeal({
                   );
                 })}
               </tbody>
+              <tfoot>
+                <tr>
+                  <td>Total</td>
+                  <td>{showTotalQuantity(totals.grams, totals.milliliters)}</td>
+                  <td>{formatTotal(totals.calories)}</td>
+                  <td>{formatTotal(totals.carbs)}</td>
+                  <td>{formatTotal(totals.protein)}</td>
+                  <td>{formatTotal(totals.fat)}</td>
+                  <td></td>
+                </tr>
+              </tfoot>
             </table>
           )}
         </div>
