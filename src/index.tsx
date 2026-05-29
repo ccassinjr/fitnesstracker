@@ -1,9 +1,4 @@
-import {
-  useMemo,
-  useState,
-  type FormEvent,
-  type ReactElement,
-} from "react";
+import { useMemo, useState, type FormEvent, type ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 import { foodDatabase } from "./food-database";
 
@@ -550,12 +545,71 @@ function FoodListItem({
   food,
   matchIndices,
   onDelete,
+  onEdit,
 }: {
   food: FoodItem;
   matchIndices: Array<number>;
   onDelete: () => void;
+  onEdit: (food: FoodItem) => void;
 }): ReactElement {
-  return (
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState(food.name);
+  const [caloriesPer100g, setCaloriesPer100g] = useState(
+    food.calories_per_100g,
+  );
+  const [carbs, setCarbs] = useState(food.carbs);
+  const [protein, setProtein] = useState(food.protein);
+  const [fat, setFat] = useState(food.fat);
+  function handleSave(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    onEdit({
+      id: food.id,
+      name: name,
+      calories_per_100g: caloriesPer100g,
+      carbs: carbs,
+      protein: protein,
+      fat: fat,
+      common_portions: food.common_portions,
+    });
+    setIsEditing(false);
+  }
+  return isEditing ? (
+    <tr>
+      <td colSpan={6}>
+        <form onSubmit={handleSave}>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            type="number"
+            value={caloriesPer100g}
+            onChange={(e) => setCaloriesPer100g(e.target.valueAsNumber)}
+          />
+          <input
+            type="number"
+            value={carbs}
+            onChange={(e) => setCarbs(e.target.valueAsNumber)}
+          />
+          <input
+            type="number"
+            value={protein}
+            onChange={(e) => setProtein(e.target.valueAsNumber)}
+          />
+          <input
+            type="number"
+            value={fat}
+            onChange={(e) => setFat(e.target.valueAsNumber)}
+          />
+          <button type="submit">Save</button>
+          <button onClick={() => setIsEditing(false)} type="button">
+            Cancel
+          </button>
+        </form>
+      </td>
+    </tr>
+  ) : (
     <tr>
       <td>{highlightMatch(food.name, matchIndices)}</td>
       <td>{food.calories_per_100g}</td>
@@ -563,6 +617,7 @@ function FoodListItem({
       <td>{food.protein}</td>
       <td>{food.fat}</td>
       <td>
+        <button onClick={() => setIsEditing(true)}>Edit</button>
         <button onClick={() => onDelete()}>Delete</button>
       </td>
     </tr>
@@ -632,9 +687,11 @@ const FOOD_PAGE_SIZE = 15;
 function FoodList({
   foods,
   onDeleteFood,
+  onEdit,
 }: {
   foods: Array<FoodItem>;
   onDeleteFood: (i: number) => void;
+  onEdit: (food: FoodItem) => void;
 }) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -685,6 +742,7 @@ function FoodList({
               food={food}
               matchIndices={matchIndices}
               onDelete={() => onDeleteFood(originalIndex)}
+              onEdit={onEdit}
             />
           ))}
         </tbody>
@@ -846,10 +904,7 @@ function LogMeal({
       pendingUnit === "weight"
         ? { type: "weight", grams: pendingAmount }
         : { type: "volume", milliliters: pendingAmount };
-    setSelectedFoods([
-      ...selectedFoods,
-      { food: pendingFood.id, quantity },
-    ]);
+    setSelectedFoods([...selectedFoods, { food: pendingFood.id, quantity }]);
     setPendingFood(null);
   }
 
@@ -1099,6 +1154,15 @@ function App() {
     });
   }
 
+  function editFood(updatedFood: FoodItem): void {
+    setDatabase({
+      ...database,
+      foods: database.foods.map((food) =>
+        food.id === updatedFood.id ? updatedFood : food,
+      ),
+    });
+  }
+
   return (
     <>
       <div className="app">
@@ -1161,7 +1225,7 @@ function App() {
           </ul>
         </nav>
         <main className="app__content">
-          {viewTab(selectedTab, database, setDatabase, deleteFood)}
+          {viewTab(selectedTab, database, setDatabase, deleteFood, editFood)}
         </main>
       </div>
     </>
@@ -1173,6 +1237,7 @@ function viewTab(
   database: Database,
   setDatabase: SetDatabase,
   deleteFood: (i: number) => void,
+  editFood: (food: FoodItem) => void,
 ): ReactElement {
   switch (tab) {
     case "Home":
@@ -1190,7 +1255,11 @@ function viewTab(
     case "FoodItems":
       return (
         <>
-          <FoodList foods={database.foods} onDeleteFood={deleteFood} />
+          <FoodList
+            foods={database.foods}
+            onDeleteFood={deleteFood}
+            onEdit={editFood}
+          />
           <hr />
           <AddFoodItem database={database} setDatabase={setDatabase} />
         </>
