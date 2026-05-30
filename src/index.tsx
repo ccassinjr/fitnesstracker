@@ -560,6 +560,9 @@ function FoodListItem({
   const [carbs, setCarbs] = useState(food.carbs);
   const [protein, setProtein] = useState(food.protein);
   const [fat, setFat] = useState(food.fat);
+  const [portionName, setPortionName] = useState("");
+  const [portionType, setPortionType] = useState<"weight" | "volume">("weight");
+  const [portionAmount, setPortionAmount] = useState(0);
   function handleSave(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     onEdit({
@@ -602,6 +605,79 @@ function FoodListItem({
             value={fat}
             onChange={(e) => setFat(e.target.valueAsNumber)}
           />
+          {food.common_portions.length === 0 ? (
+            <p>No portions added yet.</p>
+          ) : (
+            food.common_portions.map((portion, i) => (
+              <div key={i}>
+                {portion.name} - {showPortion(portion.amount)}
+                <button
+                  type="button"
+                  onClick={() =>
+                    onEdit({
+                      ...food,
+                      common_portions: food.common_portions.filter(
+                        (_, index) => index !== i,
+                      ),
+                    })
+                  }
+                >
+                  Delete
+                </button>
+              </div>
+            ))
+          )}
+          <input
+            type="text"
+            placeholder="Portion name"
+            value={portionName}
+            onChange={(e) => setPortionName(e.target.value)}
+          />
+          <label>
+            <input
+              type="radio"
+              value="weight"
+              checked={portionType === "weight"}
+              onChange={() => setPortionType("weight")}
+            />
+            Weight (g)
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="volume"
+              checked={portionType === "volume"}
+              onChange={() => setPortionType("volume")}
+            />
+            Volume (ml)
+          </label>
+          <input
+            type="number"
+            value={portionAmount}
+            onChange={(e) => setPortionAmount(e.target.valueAsNumber)}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              onEdit({
+                ...food,
+                common_portions: [
+                  ...food.common_portions,
+                  {
+                    name: portionName,
+                    amount:
+                      portionType === "weight"
+                        ? { type: "weight", grams: portionAmount }
+                        : { type: "volume", milliliters: portionAmount },
+                  },
+                ],
+              });
+              setPortionName("");
+              setPortionAmount(0);
+            }}
+          >
+            Add portion
+          </button>
           <button type="submit">Save</button>
           <button onClick={() => setIsEditing(false)} type="button">
             Cancel
