@@ -1,5 +1,5 @@
 import foodData from "../food-data.json";
-import type { FoodItem } from "./index";
+import type { FoodItem } from "./types";
 
 export const foodDatabase: Array<FoodItem> = foodData.map((entry, ix) => ({
   id: ix,

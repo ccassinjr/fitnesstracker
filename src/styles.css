@@ -27,6 +27,7 @@
   --space-2xl: 3rem;
 
   --nav-height: 3.5rem;
+  --bottom-nav-height: 4rem;
   --max-width: 48rem;
 
   --radius-sm: 4px;
@@ -135,6 +136,10 @@ button {
 .app__reset-confirm {
   font-size: var(--text-xs);
   color: var(--accent);
+}
+
+.app__content {
+  padding-bottom: calc(var(--bottom-nav-height) + var(--space-xl));
 }
 
 .tabs {

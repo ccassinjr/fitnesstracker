@@ -1,0 +1,47 @@
+import { foodDatabase } from "./food-database";
+import type { Database, AppTabs } from "./types";
+
+export const initialDatabase: Database = {
+  physicalInfo: {
+    name: "Carlos Junior",
+    height: 181,
+    sex: "male",
+    birthdate: { day: 26, month: 7, year: 1994 },
+    fitness_level: { type: "FitnessCategory", category: "moderately active" },
+    weight: [{ weight: 77000, timestamp: 1776016587021 }],
+  },
+  foods: foodDatabase,
+  meals: [],
+};
+
+const DB_KEY = "database";
+
+export function loadDatabase(): Database | null {
+  const found = window.localStorage.getItem(DB_KEY);
+  if (found === null) {
+    return null;
+  }
+
+  const database = JSON.parse(found) as Database;
+  return database;
+}
+
+export function saveDatabase(database: Database): void {
+  window.localStorage.setItem(DB_KEY, JSON.stringify(database));
+}
+
+const TAB_KEY = "tab";
+
+export function loadTab(): AppTabs | null {
+  const found = window.localStorage.getItem(TAB_KEY);
+  if (found === null) {
+    return null;
+  }
+
+  const database = JSON.parse(found) as AppTabs;
+  return database;
+}
+
+export function saveTab(tab: AppTabs): void {
+  window.localStorage.setItem(TAB_KEY, JSON.stringify(tab));
+}
