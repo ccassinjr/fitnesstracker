@@ -33,3 +33,7 @@ export function showTotalQuantity(grams: number, milliliters: number): string {
 export function formatTotal(n: number): string {
   return (Math.round(n * 10) / 10).toString();
 }
+
+export function capitalise(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
