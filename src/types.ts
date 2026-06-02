@@ -62,8 +62,6 @@ export type MealFoodEntry = {
 export type TopNav = "Home" | "Nutrition" | "Training" | "Log" | "Profile";
 export type NutritionTab = "FoodItems" | "Meals";
 
-export type AppTabs = "Home" | "PhysicalInfo" | "FoodItems" | "Meals";
-
 export type MealType = MealEntry["type"];
 
 export type SetDatabase = (db: Database) => void;
