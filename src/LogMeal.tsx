@@ -243,6 +243,27 @@ export function LogMeal({
               <p>
                 Selected: <strong>{pendingFood.name}</strong>
               </p>
+              {pendingFood.common_portions.length > 0 && (
+                <div>
+                  {pendingFood.common_portions.map((portion) => (
+                    <button
+                      key={portion.name}
+                      type="button"
+                      onClick={() => {
+                        if (portion.amount.type === "weight") {
+                          setPendingUnit("weight");
+                          setPendingAmount(portion.amount.grams);
+                        } else {
+                          setPendingUnit("volume");
+                          setPendingAmount(portion.amount.milliliters);
+                        }
+                      }}
+                    >
+                      {portion.name}
+                    </button>
+                  ))}
+                </div>
+              )}
               <label>Amount</label>
               <input
                 type="number"

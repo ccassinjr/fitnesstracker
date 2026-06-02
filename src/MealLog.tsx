@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import type { Database } from "./types";
-import { showTimestamp } from "./utils";
+import { showTimestamp, showPortion } from "./utils";
 
 export function MealLog({ database }: { database: Database }): ReactElement {
   if (database.meals.length === 0) {
@@ -20,7 +20,7 @@ export function MealLog({ database }: { database: Database }): ReactElement {
               <ul>
                 {meal.foods.map((mfe, j) => {
                   const food = foodById.get(mfe.food);
-                  return <li key={j}>{food?.name ?? "(unknown food)"}</li>;
+                  return <li key={j}>{food?.name ?? "(unknown food)"} — {showPortion(mfe.quantity)}</li>;
                 })}
               </ul>
             </li>
