@@ -1,5 +1,11 @@
 import { useState, type ReactElement } from "react";
-import type { Database, AppTabs, FoodItem, SetDatabase } from "./types";
+import type {
+  Database,
+  TopNav,
+  NutritionTab,
+  FoodItem,
+  SetDatabase,
+} from "./types";
 import { cn } from "./utils";
 import {
   loadDatabase,
@@ -8,6 +14,7 @@ import {
   saveTab,
   initialDatabase,
 } from "./storage";
+import { BottomNav } from "./BottomNav";
 import { Home } from "./Home";
 import { PhysicalInfo } from "./PhysicalInfo";
 import { FoodList } from "./FoodList";
@@ -19,13 +26,12 @@ export function App() {
   const [database, setDatabaseState] = useState<Database>(
     loadDatabase() ?? initialDatabase,
   );
-  const [selectedTab, setSelectedTabState] = useState<AppTabs>(
-    loadTab() ?? "Home",
-  );
+  const [topNav, setTopNavState] = useState<TopNav>(loadTab() ?? "Home");
+  const [nutritionTab, setNutritionTab] = useState<NutritionTab>("FoodItems");
   const [hasReset, setHasReset] = useState(false);
 
-  function setSelectedTab(tab: AppTabs): void {
-    setSelectedTabState(tab);
+  function setTopNav(tab: TopNav): void {
+    setTopNavState(tab);
     saveTab(tab);
   }
 
@@ -51,76 +57,43 @@ export function App() {
   }
 
   return (
-    <>
-      <div className="app">
-        <header className="app__header">
-          <h1 className="app__title">Fitness Tracker</h1>
-          <button
-            className="app__reset"
-            onClick={() => {
-              setDatabase(initialDatabase);
-              setHasReset(true);
-              setTimeout(() => {
-                setHasReset(false);
-              }, 3000);
-            }}
-          >
-            Reset
-          </button>
-          {hasReset ? (
-            <p className="app__reset-confirm">Database has been reset</p>
-          ) : null}
-        </header>
-        <nav className="app__nav">
-          <ul className="tabs">
-            <li
-              className={cn({
-                tabs__tab: true,
-                "tabs__tab--active": selectedTab === "Home",
-              })}
-              onClick={() => setSelectedTab("Home")}
-            >
-              Home
-            </li>
-            <li
-              className={cn({
-                tabs__tab: true,
-                "tabs__tab--active": selectedTab === "PhysicalInfo",
-              })}
-              onClick={() => setSelectedTab("PhysicalInfo")}
-            >
-              Physical Information
-            </li>
-            <li
-              className={cn({
-                tabs__tab: true,
-                "tabs__tab--active": selectedTab === "FoodItems",
-              })}
-              onClick={() => setSelectedTab("FoodItems")}
-            >
-              Food Items
-            </li>
-            <li
-              className={cn({
-                tabs__tab: true,
-                "tabs__tab--active": selectedTab === "Meals",
-              })}
-              onClick={() => setSelectedTab("Meals")}
-            >
-              Meals
-            </li>
-          </ul>
-        </nav>
-        <main className="app__content">
-          {viewTab(selectedTab, database, setDatabase, deleteFood, editFood)}
-        </main>
-      </div>
-    </>
+    <div className="app">
+      <header className="app__header">
+        <h1 className="app__title">Fitness Tracker</h1>
+        <button
+          className="app__reset"
+          onClick={() => {
+            setDatabase(initialDatabase);
+            setHasReset(true);
+            setTimeout(() => setHasReset(false), 3000);
+          }}
+        >
+          Reset
+        </button>
+        {hasReset && (
+          <p className="app__reset-confirm">Database has been reset</p>
+        )}
+      </header>
+      <main className="app__content">
+        {viewTab(
+          topNav,
+          nutritionTab,
+          setNutritionTab,
+          database,
+          setDatabase,
+          deleteFood,
+          editFood,
+        )}
+      </main>
+      <BottomNav active={topNav} onChange={setTopNav} />
+    </div>
   );
 }
 
 function viewTab(
-  tab: AppTabs,
+  tab: TopNav,
+  nutritionTab: NutritionTab,
+  setNutritionTab: (tab: NutritionTab) => void,
   database: Database,
   setDatabase: SetDatabase,
   deleteFood: (i: number) => void,
@@ -129,38 +102,78 @@ function viewTab(
   switch (tab) {
     case "Home":
       return <Home />;
-    case "PhysicalInfo":
+    case "Nutrition":
       return (
         <>
-          <PhysicalInfo
-            physicalInfo={database.physicalInfo}
-            setDatabase={setDatabase}
-            database={database}
-          />
+          <nav>
+            <ul className="tabs">
+              <li
+                className={cn({
+                  tabs__tab: true,
+                  "tabs__tab--active": nutritionTab === "FoodItems",
+                })}
+                onClick={() => setNutritionTab("FoodItems")}
+              >
+                Food items
+              </li>
+              <li
+                className={cn({
+                  tabs__tab: true,
+                  "tabs__tab--active": nutritionTab === "Meals",
+                })}
+                onClick={() => setNutritionTab("Meals")}
+              >
+                Meals
+              </li>
+            </ul>
+          </nav>
+          {nutritionTab === "FoodItems" ? (
+            <>
+              <FoodList
+                foods={database.foods}
+                onDeleteFood={deleteFood}
+                onEdit={editFood}
+              />
+              <div className="section-divider" />
+              <AddFoodItem database={database} setDatabase={setDatabase} />
+            </>
+          ) : (
+            <>
+              <LogMeal database={database} setDatabase={setDatabase} />
+              <div className="section-divider" />
+              <MealLog database={database} />
+            </>
+          )}
         </>
       );
-    case "FoodItems":
+    case "Training":
       return (
-        <>
-          <FoodList
-            foods={database.foods}
-            onDeleteFood={deleteFood}
-            onEdit={editFood}
-          />
-          <hr />
-          <AddFoodItem database={database} setDatabase={setDatabase} />
-        </>
+        <div className="section placeholder">
+          <div className="section__header">
+            <h2 className="section__title">Training</h2>
+          </div>
+          <p className="placeholder__message">Coming soon.</p>
+        </div>
       );
-    case "Meals":
+    case "Log":
       return (
-        <>
-          <LogMeal database={database} setDatabase={setDatabase} />
-          <hr />
-          <MealLog database={database} />
-        </>
+        <div className="section placeholder">
+          <div className="section__header">
+            <h2 className="section__title">Daily log</h2>
+          </div>
+          <p className="placeholder__message">Coming soon.</p>
+        </div>
+      );
+    case "Profile":
+      return (
+        <PhysicalInfo
+          physicalInfo={database.physicalInfo}
+          setDatabase={setDatabase}
+          database={database}
+        />
       );
     default:
       tab satisfies never;
-      throw new Error(`Invalid tab name: '${tab}'`);
+      throw new Error(`Invalid tab: '${tab}'`);
   }
 }
