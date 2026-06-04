@@ -101,7 +101,7 @@ function viewTab(
 ): ReactElement {
   switch (tab) {
     case "Home":
-      return <Home />;
+      return <Home database={database} />;
     case "Nutrition":
       return (
         <>
