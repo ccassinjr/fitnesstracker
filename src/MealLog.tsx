@@ -1,31 +1,51 @@
 import type { ReactElement } from "react";
 import type { Database } from "./types";
-import { showTimestamp, showPortion } from "./utils";
+import { showTimestamp, showPortion, capitalise } from "./utils";
 
 export function MealLog({ database }: { database: Database }): ReactElement {
-  if (database.meals.length === 0) {
-    return <p>No meals logged yet.</p>;
-  }
   const foodById = new Map(database.foods.map((f) => [f.id, f]));
+
   return (
-    <>
-      <h2>Logged Meals</h2>
-      <ul>
-        {database.meals
-          .slice()
-          .reverse()
-          .map((meal, i) => (
-            <li key={i}>
-              <strong>{meal.type}</strong> — {showTimestamp(meal.time)}
-              <ul>
-                {meal.foods.map((mfe, j) => {
-                  const food = foodById.get(mfe.food);
-                  return <li key={j}>{food?.name ?? "(unknown food)"} — {showPortion(mfe.quantity)}</li>;
-                })}
-              </ul>
-            </li>
-          ))}
-      </ul>
-    </>
+    <div className="section meal-log">
+      <div className="section__header">
+        <h2 className="section__title">Meal history</h2>
+      </div>
+      {database.meals.length === 0 ? (
+        <p className="meal-log__empty">No meals logged yet.</p>
+      ) : (
+        <ul className="meal-log__list">
+          {database.meals
+            .slice()
+            .reverse()
+            .map((meal, i) => (
+              <li key={i} className="meal-log__item">
+                <div className="meal-log__item-header">
+                  <span className="meal-log__item-type">
+                    {capitalise(meal.type)}
+                  </span>
+                  <span className="meal-log__item-time">
+                    {showTimestamp(meal.time)}
+                  </span>
+                </div>
+                <ul className="meal-log__foods">
+                  {meal.foods.map((mfe, j) => {
+                    const food = foodById.get(mfe.food);
+                    return (
+                      <li key={j} className="meal-log__food">
+                        <span className="meal-log__food-name">
+                          {food?.name ?? "(unknown food)"}
+                        </span>
+                        <span className="meal-log__food-quantity">
+                          {showPortion(mfe.quantity)}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ))}
+        </ul>
+      )}
+    </div>
   );
 }

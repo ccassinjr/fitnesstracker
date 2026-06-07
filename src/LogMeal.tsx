@@ -7,7 +7,12 @@ import type {
   MealType,
   PortionAmount,
 } from "./types";
-import { showPortion, showTotalQuantity, formatTotal } from "./utils";
+import {
+  showPortion,
+  showTotalQuantity,
+  formatTotal,
+  capitalise,
+} from "./utils";
 import { fuzzyMatch, fuzzyScore, highlightMatch } from "./fuzzy";
 
 const MEAL_TYPES: Array<MealType> = ["breakfast", "lunch", "dinner", "snack"];
@@ -126,107 +131,144 @@ export function LogMeal({
     Number.isFinite(pendingAmount) && pendingAmount > 0;
 
   return (
-    <>
-      <h2>Log Meal</h2>
-      <form onSubmit={handleLogMeal}>
-        <div>
-          <label>Meal type</label>
+    <div className="section meal-form">
+      <div className="section__header">
+        <h2 className="section__title">Log meal</h2>
+      </div>
+      <form className="meal-form__form" onSubmit={handleLogMeal}>
+        <div className="meal-form__field">
+          <label className="meal-form__label">Meal type</label>
           <select
+            className="meal-form__select"
             value={mealType}
             onChange={(e) => setMealType(e.target.value as MealType)}
           >
             {MEAL_TYPES.map((t) => (
               <option key={t} value={t}>
-                {t}
+                {capitalise(t)}
               </option>
             ))}
           </select>
         </div>
-
-        <div>
-          <label>Foods</label>
+        <div className="meal-form__field">
+          <label className="meal-form__label">Foods</label>
           {selectedFoods.length === 0 ? (
-            <p>No foods selected yet.</p>
+            <p className="meal-form__foods-empty">No foods added yet.</p>
           ) : (
-            <table>
-              <thead>
-                <tr>
-                  <td>Name</td>
-                  <td>Quantity</td>
-                  <td>Calories per 100g</td>
-                  <td>Carbs g</td>
-                  <td>Protein g</td>
-                  <td>Fat g</td>
-                  <td></td>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedFoods.map((entry, i) => {
-                  const food = foodById.get(entry.food);
-                  if (food === undefined) {
+            <div className="meal-form__table-wrapper">
+              <table className="meal-form__table">
+                <thead>
+                  <tr>
+                    <th className="meal-form__th meal-form__th--name">Name</th>
+                    <th className="meal-form__th">Quantity</th>
+                    <th className="meal-form__th">kcal / 100g</th>
+                    <th className="meal-form__th">Carbs g</th>
+                    <th className="meal-form__th">Protein g</th>
+                    <th className="meal-form__th">Fat g</th>
+                    <th className="meal-form__th"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedFoods.map((entry, i) => {
+                    const food = foodById.get(entry.food);
+                    if (food === undefined) {
+                      return (
+                        <tr key={i} className="meal-form__row">
+                          <td className="meal-form__cell meal-form__cell--unknown">
+                            (unknown food)
+                          </td>
+                          <td className="meal-form__cell">
+                            {showPortion(entry.quantity)}
+                          </td>
+                          <td className="meal-form__cell" colSpan={4}></td>
+                          <td className="meal-form__cell meal-form__cell--actions">
+                            <button
+                              className="meal-form__remove"
+                              type="button"
+                              onClick={() => removeFood(i)}
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    }
                     return (
-                      <tr key={i}>
-                        <td>(unknown food)</td>
-                        <td>{showPortion(entry.quantity)}</td>
-                        <td colSpan={4}></td>
-                        <td>
-                          <button type="button" onClick={() => removeFood(i)}>
+                      <tr key={i} className="meal-form__row">
+                        <td className="meal-form__cell meal-form__cell--name">
+                          {food.name}
+                        </td>
+                        <td className="meal-form__cell">
+                          {showPortion(entry.quantity)}
+                        </td>
+                        <td className="meal-form__cell">
+                          {food.calories_per_100g}
+                        </td>
+                        <td className="meal-form__cell">{food.carbs}</td>
+                        <td className="meal-form__cell">{food.protein}</td>
+                        <td className="meal-form__cell">{food.fat}</td>
+                        <td className="meal-form__cell meal-form__cell--actions">
+                          <button
+                            className="meal-form__remove"
+                            type="button"
+                            onClick={() => removeFood(i)}
+                          >
                             Remove
                           </button>
                         </td>
                       </tr>
                     );
-                  }
-                  return (
-                    <tr key={i}>
-                      <td>{food.name}</td>
-                      <td>{showPortion(entry.quantity)}</td>
-                      <td>{food.calories_per_100g}</td>
-                      <td>{food.carbs}</td>
-                      <td>{food.protein}</td>
-                      <td>{food.fat}</td>
-                      <td>
-                        <button type="button" onClick={() => removeFood(i)}>
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td>Total</td>
-                  <td>{showTotalQuantity(totals.grams, totals.milliliters)}</td>
-                  <td>{formatTotal(totals.calories)}</td>
-                  <td>{formatTotal(totals.carbs)}</td>
-                  <td>{formatTotal(totals.protein)}</td>
-                  <td>{formatTotal(totals.fat)}</td>
-                  <td></td>
-                </tr>
-              </tfoot>
-            </table>
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr className="meal-form__total-row">
+                    <td className="meal-form__total-cell meal-form__total-cell--label">
+                      Total
+                    </td>
+                    <td className="meal-form__total-cell">
+                      {showTotalQuantity(totals.grams, totals.milliliters)}
+                    </td>
+                    <td className="meal-form__total-cell">
+                      {formatTotal(totals.calories)}
+                    </td>
+                    <td className="meal-form__total-cell">
+                      {formatTotal(totals.carbs)}
+                    </td>
+                    <td className="meal-form__total-cell">
+                      {formatTotal(totals.protein)}
+                    </td>
+                    <td className="meal-form__total-cell">
+                      {formatTotal(totals.fat)}
+                    </td>
+                    <td className="meal-form__total-cell"></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
           )}
         </div>
-
-        <div>
-          <label>Add food</label>
+        <div className="meal-form__search-section">
+          <label className="meal-form__label">Add food</label>
           {pendingFood === null ? (
-            <>
+            <div className="meal-form__search">
               <input
+                className="meal-form__search-input"
                 type="text"
                 placeholder="Search foods..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
               {query.trim() !== "" && (
-                <ul>
+                <ul className="meal-form__results">
                   {topResults.length === 0 ? (
-                    <li>No matches</li>
+                    <li className="meal-form__result-item meal-form__result-item--empty">
+                      No matches found
+                    </li>
                   ) : (
                     topResults.map(({ food, indices }) => (
-                      <li key={food.id}>
+                      <li key={food.id} className="meal-form__result-item">
                         <button
+                          className="meal-form__result-btn"
                           type="button"
                           onClick={() => startAddingFood(food)}
                         >
@@ -237,17 +279,16 @@ export function LogMeal({
                   )}
                 </ul>
               )}
-            </>
+            </div>
           ) : (
-            <div>
-              <p>
-                Selected: <strong>{pendingFood.name}</strong>
-              </p>
+            <div className="meal-form__pending">
+              <p className="meal-form__pending-name">{pendingFood.name}</p>
               {pendingFood.common_portions.length > 0 && (
-                <div>
+                <div className="meal-form__portions">
                   {pendingFood.common_portions.map((portion) => (
                     <button
                       key={portion.name}
+                      className="meal-form__portion-btn"
                       type="button"
                       onClick={() => {
                         if (portion.amount.type === "weight") {
@@ -264,43 +305,54 @@ export function LogMeal({
                   ))}
                 </div>
               )}
-              <label>Amount</label>
-              <input
-                type="number"
-                min="0"
-                step="any"
-                value={pendingAmount}
-                onChange={(e) => setPendingAmount(e.target.valueAsNumber)}
-              />
-              <select
-                value={pendingUnit}
-                onChange={(e) =>
-                  setPendingUnit(e.target.value as "weight" | "volume")
-                }
-              >
-                <option value="weight">grams</option>
-                <option value="volume">milliliters</option>
-              </select>
-              <button
-                type="button"
-                onClick={confirmPendingFood}
-                disabled={!pendingAmountValid}
-              >
-                Add
-              </button>
-              <button type="button" onClick={cancelPendingFood}>
-                Cancel
-              </button>
+              <div className="meal-form__pending-amount">
+                <input
+                  className="meal-form__amount-input"
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={pendingAmount}
+                  onChange={(e) => setPendingAmount(e.target.valueAsNumber)}
+                />
+                <select
+                  className="meal-form__unit-select"
+                  value={pendingUnit}
+                  onChange={(e) =>
+                    setPendingUnit(e.target.value as "weight" | "volume")
+                  }
+                >
+                  <option value="weight">Grams</option>
+                  <option value="volume">Millilitres</option>
+                </select>
+              </div>
+              <div className="meal-form__pending-actions">
+                <button
+                  className="meal-form__btn meal-form__btn--primary"
+                  type="button"
+                  onClick={confirmPendingFood}
+                  disabled={!pendingAmountValid}
+                >
+                  Add to meal
+                </button>
+                <button
+                  className="meal-form__btn meal-form__btn--ghost"
+                  type="button"
+                  onClick={cancelPendingFood}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           )}
         </div>
-
-        <div>
-          <button type="submit" disabled={selectedFoods.length === 0}>
-            Log meal
-          </button>
-        </div>
+        <button
+          className="meal-form__btn meal-form__btn--submit"
+          type="submit"
+          disabled={selectedFoods.length === 0}
+        >
+          Log meal
+        </button>
       </form>
-    </>
+    </div>
   );
 }
