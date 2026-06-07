@@ -8,7 +8,13 @@ export function cn(classes: Record<string, boolean>): string {
 }
 
 export function showTimestamp(timestamp: Timestamp): string {
-  return new Date(timestamp).toString();
+  return new Date(timestamp).toLocaleString(undefined, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export function showWeight(grams: Grams): string {
