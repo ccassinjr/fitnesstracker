@@ -1,7 +1,7 @@
 import { useState, type FormEvent, type ReactElement } from "react";
 import type { FoodItem } from "./types";
 import { showPortion } from "./utils";
-import { fuzzyMatch, highlightMatch } from "./fuzzy";
+import { fuzzyMatch, fuzzyScore, highlightMatch } from "./fuzzy";
 
 const FOOD_PAGE_SIZE = 15;
 
@@ -263,14 +263,19 @@ export function FoodList({
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
 
-  const filteredFoods = foods
-    .map((food, originalIndex) => {
-      const matchIndices = fuzzyMatch(query, food.name);
-      return matchIndices === null
-        ? null
-        : { food, originalIndex, matchIndices };
-    })
-    .filter((entry) => entry !== null);
+  const filteredFoods =
+    query.trim() === ""
+      ? []
+      : foods
+          .map((food, originalIndex) => {
+            const matchIndices = fuzzyMatch(query, food.name);
+            if (matchIndices === null) return null;
+            const score = fuzzyScore(matchIndices, food.name);
+            return score < 18
+              ? null
+              : { food, originalIndex, matchIndices, score };
+          })
+          .filter((entry) => entry !== null);
 
   const totalPages = Math.max(
     1,
@@ -288,59 +293,65 @@ export function FoodList({
       <input
         className="food-list__filter"
         type="text"
-        placeholder="Filter food items..."
+        placeholder="Search food items..."
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
           setPage(0);
         }}
       />
-      <div className="food-list__table-wrapper">
-        <table className="food-list__table">
-          <thead>
-            <tr>
-              <th className="food-list__th food-list__th--name">Name</th>
-              <th className="food-list__th">kcal / 100g</th>
-              <th className="food-list__th">Carbs g</th>
-              <th className="food-list__th">Protein g</th>
-              <th className="food-list__th">Fat g</th>
-              <th className="food-list__th food-list__th--actions"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {pageItems.map(({ food, originalIndex, matchIndices }) => (
-              <FoodListItem
-                key={originalIndex}
-                food={food}
-                matchIndices={matchIndices}
-                onDelete={() => onDeleteFood(originalIndex)}
-                onEdit={onEdit}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="food-list__pagination">
-        <button
-          className="food-list__pagination-btn"
-          type="button"
-          onClick={() => setPage(currentPage - 1)}
-          disabled={currentPage === 0}
-        >
-          Previous
-        </button>
-        <span className="food-list__pagination-info">
-          Page {currentPage + 1} of {totalPages} · {filteredFoods.length} items
-        </span>
-        <button
-          className="food-list__pagination-btn"
-          type="button"
-          onClick={() => setPage(currentPage + 1)}
-          disabled={currentPage >= totalPages - 1}
-        >
-          Next
-        </button>
-      </div>
+      {query.trim() === "" ? null : filteredFoods.length === 0 ? (
+        <p className="food-list__empty">No results for "{query}".</p>
+      ) : (
+        <>
+          <div className="food-list__table-wrapper">
+            <table className="food-list__table">
+              <thead>
+                <tr>
+                  <th className="food-list__th food-list__th--name">Name</th>
+                  <th className="food-list__th">kcal / 100g</th>
+                  <th className="food-list__th">Carbs g</th>
+                  <th className="food-list__th">Protein g</th>
+                  <th className="food-list__th">Fat g</th>
+                  <th className="food-list__th food-list__th--actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {pageItems.map(({ food, originalIndex, matchIndices }) => (
+                  <FoodListItem
+                    key={originalIndex}
+                    food={food}
+                    matchIndices={matchIndices}
+                    onDelete={() => onDeleteFood(originalIndex)}
+                    onEdit={onEdit}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="food-list__pagination">
+            <button
+              className="food-list__pagination-btn"
+              type="button"
+              onClick={() => setPage(currentPage - 1)}
+              disabled={currentPage === 0}
+            >
+              Previous
+            </button>
+            <span className="food-list__pagination-info">
+              Page {currentPage + 1} of {totalPages} · {filteredFoods.length} items
+            </span>
+            <button
+              className="food-list__pagination-btn"
+              type="button"
+              onClick={() => setPage(currentPage + 1)}
+              disabled={currentPage >= totalPages - 1}
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

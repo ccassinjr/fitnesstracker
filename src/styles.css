@@ -679,6 +679,11 @@ button {
   text-align: center;
 }
 
+.food-list__empty {
+  text-align: center;
+  padding: var(--space-xl) 0;
+}
+
 .food-item:nth-child(even) {
   background: var(--surface-2);
 }
