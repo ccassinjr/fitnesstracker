@@ -8,6 +8,7 @@
   --accent-muted: #39d98a40;
   --text: #eceff4;
   --muted: #7b8ba0;
+  --danger: #e53e3e;
 
   --font-display: "Barlow", sans-serif;
   --font-body: "Inter", sans-serif;
@@ -93,6 +94,13 @@ select,
 button {
   font-family: var(--font-body);
   font-size: var(--text-sm);
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237b8ba0' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-sm) center;
+  padding-right: calc(var(--space-md) + 20px);
 }
 
 .app {
@@ -742,8 +750,8 @@ button {
 }
 
 .food-item__btn--remove:hover {
-  color: var(--text);
-  border-color: var(--muted);
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 .food-item__edit-cell {
@@ -1129,8 +1137,8 @@ button {
 }
 
 .meal-form__remove:hover {
-  color: var(--text);
-  border-color: var(--muted);
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 .meal-form__total-row {
@@ -1298,7 +1306,7 @@ button {
 .meal-form__unit-select {
   font-size: var(--text-base);
   color: var(--text);
-  background: var(--surface);
+  background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: var(--space-sm) var(--space-md);
@@ -1437,4 +1445,21 @@ button {
 .meal-log__food-quantity {
   font-size: var(--text-xs);
   color: var(--muted);
+}
+
+.meal-log__delete {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.meal-log__delete:hover {
+  color: var(--danger);
+  border-color: var(--danger);
 }

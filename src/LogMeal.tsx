@@ -84,7 +84,7 @@ export function LogMeal({
   function startAddingFood(food: FoodItem) {
     setPendingFood(food);
     setPendingUnit("weight");
-    setPendingAmount(100);
+    setPendingAmount(NaN);
     setQuery("");
   }
 
@@ -161,7 +161,7 @@ export function LogMeal({
                   <tr>
                     <th className="meal-form__th meal-form__th--name">Name</th>
                     <th className="meal-form__th">Quantity</th>
-                    <th className="meal-form__th">kcal / 100g</th>
+                    <th className="meal-form__th">kcal</th>
                     <th className="meal-form__th">Carbs g</th>
                     <th className="meal-form__th">Protein g</th>
                     <th className="meal-form__th">Fat g</th>
@@ -201,12 +201,24 @@ export function LogMeal({
                         <td className="meal-form__cell">
                           {showPortion(entry.quantity)}
                         </td>
-                        <td className="meal-form__cell">
-                          {food.calories_per_100g}
-                        </td>
-                        <td className="meal-form__cell">{food.carbs}</td>
-                        <td className="meal-form__cell">{food.protein}</td>
-                        <td className="meal-form__cell">{food.fat}</td>
+                        {entry.quantity.type === "weight" ? (
+                          <>
+                            <td className="meal-form__cell">
+                              {formatTotal((food.calories_per_100g * entry.quantity.grams) / 100)}
+                            </td>
+                            <td className="meal-form__cell">
+                              {formatTotal((food.carbs * entry.quantity.grams) / 100)}
+                            </td>
+                            <td className="meal-form__cell">
+                              {formatTotal((food.protein * entry.quantity.grams) / 100)}
+                            </td>
+                            <td className="meal-form__cell">
+                              {formatTotal((food.fat * entry.quantity.grams) / 100)}
+                            </td>
+                          </>
+                        ) : (
+                          <td className="meal-form__cell" colSpan={4}>—</td>
+                        )}
                         <td className="meal-form__cell meal-form__cell--actions">
                           <button
                             className="meal-form__remove"
@@ -311,7 +323,8 @@ export function LogMeal({
                   type="number"
                   min="0"
                   step="any"
-                  value={pendingAmount}
+                  placeholder="e.g. 100"
+                  value={isNaN(pendingAmount) ? "" : pendingAmount}
                   onChange={(e) => setPendingAmount(e.target.valueAsNumber)}
                 />
                 <select

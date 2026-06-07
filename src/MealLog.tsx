@@ -1,9 +1,23 @@
 import type { ReactElement } from "react";
-import type { Database } from "./types";
+import type { Database, SetDatabase } from "./types";
 import { showTimestamp, showPortion, capitalise } from "./utils";
 
-export function MealLog({ database }: { database: Database }): ReactElement {
+export function MealLog({
+  database,
+  setDatabase,
+}: {
+  database: Database;
+  setDatabase: SetDatabase;
+}): ReactElement {
   const foodById = new Map(database.foods.map((f) => [f.id, f]));
+
+  function deleteMeal(reversedIdx: number) {
+    const originalIdx = database.meals.length - 1 - reversedIdx;
+    setDatabase({
+      ...database,
+      meals: database.meals.filter((_, i) => i !== originalIdx),
+    });
+  }
 
   return (
     <div className="section meal-log">
@@ -26,6 +40,13 @@ export function MealLog({ database }: { database: Database }): ReactElement {
                   <span className="meal-log__item-time">
                     {showTimestamp(meal.time)}
                   </span>
+                  <button
+                    className="meal-log__delete"
+                    type="button"
+                    onClick={() => deleteMeal(i)}
+                  >
+                    Delete
+                  </button>
                 </div>
                 <ul className="meal-log__foods">
                   {meal.foods.map((mfe, j) => {

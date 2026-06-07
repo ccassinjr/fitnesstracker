@@ -141,7 +141,7 @@ function viewTab(
             <>
               <LogMeal database={database} setDatabase={setDatabase} />
               <div className="section-divider" />
-              <MealLog database={database} />
+              <MealLog database={database} setDatabase={setDatabase} />
             </>
           )}
         </>
