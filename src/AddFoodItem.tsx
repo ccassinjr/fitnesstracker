@@ -74,7 +74,7 @@ export function AddFoodItem({
           />
         </div>
         <div className="food-form__field">
-          <label className="food-form__label">Carbohydrates (%)</label>
+          <label className="food-form__label">Carbohydrates per 100g</label>
           <input
             className="food-form__input"
             name="carbs"
@@ -89,7 +89,7 @@ export function AddFoodItem({
           />
         </div>
         <div className="food-form__field">
-          <label className="food-form__label">Protein (%)</label>
+          <label className="food-form__label">Protein per 100g</label>
           <input
             className="food-form__input"
             name="protein"
@@ -104,7 +104,7 @@ export function AddFoodItem({
           />
         </div>
         <div className="food-form__field">
-          <label className="food-form__label">Fat (%)</label>
+          <label className="food-form__label">Fat per 100g</label>
           <input
             className="food-form__input"
             name="fat"

@@ -3,7 +3,7 @@ export type Database = {
   foods: Array<FoodItem>;
   meals: Array<MealEntry>;
 };
-export type Percentage = number;
+export type GramsPer100g = number;
 
 export type Timestamp = number;
 export type Grams = number;
@@ -42,9 +42,9 @@ export type FoodItem = {
   id: FoodId;
   name: string;
   calories_per_100g: number;
-  carbs: Percentage;
-  protein: Percentage;
-  fat: Percentage;
+  carbs: GramsPer100g;
+  protein: GramsPer100g;
+  fat: GramsPer100g;
   common_portions: Array<FoodPortion>;
 };
 

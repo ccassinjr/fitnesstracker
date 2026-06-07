@@ -67,7 +67,9 @@ function FoodListItem({
               />
             </div>
             <div className="food-item__edit-field">
-              <label className="food-item__edit-label">Carbohydrates (%)</label>
+              <label className="food-item__edit-label">
+                Carbohydrates per 100g
+              </label>
               <input
                 className="food-item__edit-input"
                 type="number"
@@ -79,7 +81,7 @@ function FoodListItem({
               />
             </div>
             <div className="food-item__edit-field">
-              <label className="food-item__edit-label">Protein (%)</label>
+              <label className="food-item__edit-label">Protein per 100g</label>
               <input
                 className="food-item__edit-input"
                 type="number"
@@ -91,7 +93,7 @@ function FoodListItem({
               />
             </div>
             <div className="food-item__edit-field">
-              <label className="food-item__edit-label">Fat (%)</label>
+              <label className="food-item__edit-label">Fat per 100g</label>
               <input
                 className="food-item__edit-input"
                 type="number"
@@ -226,11 +228,9 @@ function FoodListItem({
       <td className="food-item__cell food-item__cell--value">
         {food.calories_per_100g}
       </td>
-      <td className="food-item__cell food-item__cell--value">{food.carbs}%</td>
-      <td className="food-item__cell food-item__cell--value">
-        {food.protein}%
-      </td>
-      <td className="food-item__cell food-item__cell--value">{food.fat}%</td>
+      <td className="food-item__cell food-item__cell--value">{food.carbs}</td>
+      <td className="food-item__cell food-item__cell--value">{food.protein}</td>
+      <td className="food-item__cell food-item__cell--value">{food.fat}</td>
       <td className="food-item__cell food-item__cell--actions">
         <button
           className="food-item__btn food-item__btn--edit"
@@ -301,9 +301,9 @@ export function FoodList({
             <tr>
               <th className="food-list__th food-list__th--name">Name</th>
               <th className="food-list__th">kcal / 100g</th>
-              <th className="food-list__th">Carbs %</th>
-              <th className="food-list__th">Protein %</th>
-              <th className="food-list__th">Fat %</th>
+              <th className="food-list__th">Carbs g</th>
+              <th className="food-list__th">Protein g</th>
+              <th className="food-list__th">Fat g</th>
               <th className="food-list__th food-list__th--actions"></th>
             </tr>
           </thead>

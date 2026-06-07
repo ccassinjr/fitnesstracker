@@ -154,9 +154,9 @@ export function LogMeal({
                   <td>Name</td>
                   <td>Quantity</td>
                   <td>Calories per 100g</td>
-                  <td>Carbs</td>
-                  <td>Protein</td>
-                  <td>Fat</td>
+                  <td>Carbs g</td>
+                  <td>Protein g</td>
+                  <td>Fat g</td>
                   <td></td>
                 </tr>
               </thead>
