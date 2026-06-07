@@ -37,3 +37,11 @@ export function formatTotal(n: number): string {
 export function capitalise(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function titleCase(str: string): string {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}

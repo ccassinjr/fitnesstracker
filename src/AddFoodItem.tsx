@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import type { Database, SetDatabase } from "./types";
+import { titleCase } from "./utils";
 
 export function AddFoodItem({
   database,
@@ -22,7 +23,7 @@ export function AddFoodItem({
         ...database.foods,
         {
           id: Date.now(),
-          name,
+          name: titleCase(name),
           calories_per_100g: caloriesPer100g,
           carbs,
           protein,
