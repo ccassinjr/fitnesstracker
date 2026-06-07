@@ -1192,14 +1192,10 @@ select {
 }
 
 .meal-form__results {
-  position: absolute;
-  top: calc(100% + var(--space-xs));
-  left: 0;
-  right: 0;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  z-index: 10;
+  margin-top: var(--space-xs);
   max-height: 240px;
   overflow-y: auto;
 }

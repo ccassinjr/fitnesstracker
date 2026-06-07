@@ -41,7 +41,9 @@ export function LogMeal({
     for (const food of database.foods) {
       const indices = fuzzyMatch(query, food.name);
       if (indices === null) continue;
-      matches.push({ food, indices, score: fuzzyScore(indices, food.name) });
+      const score = fuzzyScore(indices, food.name);
+      if (score < 18) continue;
+      matches.push({ food, indices, score });
     }
     matches.sort((a, b) => b.score - a.score);
     return matches.slice(0, 5);
@@ -204,20 +206,32 @@ export function LogMeal({
                         {entry.quantity.type === "weight" ? (
                           <>
                             <td className="meal-form__cell">
-                              {formatTotal((food.calories_per_100g * entry.quantity.grams) / 100)}
+                              {formatTotal(
+                                (food.calories_per_100g *
+                                  entry.quantity.grams) /
+                                  100,
+                              )}
                             </td>
                             <td className="meal-form__cell">
-                              {formatTotal((food.carbs * entry.quantity.grams) / 100)}
+                              {formatTotal(
+                                (food.carbs * entry.quantity.grams) / 100,
+                              )}
                             </td>
                             <td className="meal-form__cell">
-                              {formatTotal((food.protein * entry.quantity.grams) / 100)}
+                              {formatTotal(
+                                (food.protein * entry.quantity.grams) / 100,
+                              )}
                             </td>
                             <td className="meal-form__cell">
-                              {formatTotal((food.fat * entry.quantity.grams) / 100)}
+                              {formatTotal(
+                                (food.fat * entry.quantity.grams) / 100,
+                              )}
                             </td>
                           </>
                         ) : (
-                          <td className="meal-form__cell" colSpan={4}>—</td>
+                          <td className="meal-form__cell" colSpan={4}>
+                            —
+                          </td>
                         )}
                         <td className="meal-form__cell meal-form__cell--actions">
                           <button
