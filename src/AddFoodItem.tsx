@@ -9,10 +9,10 @@ export function AddFoodItem({
   setDatabase: SetDatabase;
 }) {
   const [name, setName] = useState("");
-  const [caloriesPer100g, setCaloriesPer100g] = useState(0);
-  const [carbs, setCarbs] = useState(0);
-  const [protein, setProtein] = useState(0);
-  const [fat, setFat] = useState(0);
+  const [caloriesPer100g, setCaloriesPer100g] = useState(NaN);
+  const [carbs, setCarbs] = useState(NaN);
+  const [protein, setProtein] = useState(NaN);
+  const [fat, setFat] = useState(NaN);
 
   function handleAddFood(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -33,86 +33,104 @@ export function AddFoodItem({
     });
     // reset the form.
     setName("");
-    setCaloriesPer100g(0);
-    setCarbs(0);
-    setProtein(0);
-    setFat(0);
+    setCaloriesPer100g(NaN);
+    setCarbs(NaN);
+    setProtein(NaN);
+    setFat(NaN);
   }
+
   return (
-    <>
-      <h2>Add Food Item</h2>
-      <form onSubmit={handleAddFood}>
-        <div>
-          <label>Food Name</label>
+    <div className="section food-form">
+      <div className="section__header">
+        <h2 className="section__title">Add food item</h2>
+      </div>
+      <form className="food-form__form" onSubmit={handleAddFood}>
+        <div className="food-form__field">
+          <label className="food-form__label">Name</label>
           <input
+            className="food-form__input"
             name="name"
             type="text"
-            placeholder="Food name"
+            placeholder="e.g. Chicken breast"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-        <div>
-          <label>Calories (per 100g)</label>
+        <div className="food-form__field">
+          <label className="food-form__label">Calories per 100g</label>
           <input
+            className="food-form__input"
             name="calories_per_100g"
             type="number"
-            placeholder="Calories per 100g"
+            placeholder="e.g. 165"
             required
-            value={caloriesPer100g}
-            onChange={(e) => {
-              const v = e.target.valueAsNumber;
-              if (!isNaN(v)) setCaloriesPer100g(v);
+            value={isNaN(caloriesPer100g) ? "" : caloriesPer100g}
+            onChange={(e) => setCaloriesPer100g(e.target.valueAsNumber)}
+            onKeyDown={(e) => {
+              if (e.key === "e" || e.key === "E") e.preventDefault();
             }}
           />
         </div>
-        <div>
-          <label>Carbs</label>
+        <div className="food-form__field">
+          <label className="food-form__label">Carbohydrates (%)</label>
           <input
+            className="food-form__input"
             name="carbs"
             type="number"
-            placeholder="carbs"
+            placeholder="e.g. 12"
             required
-            value={carbs}
-            onChange={(e) => {
-              const v = e.target.valueAsNumber;
-              if (!isNaN(v)) setCarbs(v);
+            value={isNaN(carbs) ? "" : carbs}
+            onChange={(e) => setCarbs(e.target.valueAsNumber)}
+            onKeyDown={(e) => {
+              if (e.key === "e" || e.key === "E") e.preventDefault();
             }}
           />
         </div>
-        <div>
-          <label>Protein</label>
+        <div className="food-form__field">
+          <label className="food-form__label">Protein (%)</label>
           <input
+            className="food-form__input"
             name="protein"
             type="number"
-            placeholder="protein"
+            placeholder="e.g. 31"
             required
-            value={protein}
-            onChange={(e) => {
-              const v = e.target.valueAsNumber;
-              if (!isNaN(v)) setProtein(v);
+            value={isNaN(protein) ? "" : protein}
+            onChange={(e) => setProtein(e.target.valueAsNumber)}
+            onKeyDown={(e) => {
+              if (e.key === "e" || e.key === "E") e.preventDefault();
             }}
           />
         </div>
-        <div>
-          <label>Fat</label>
+        <div className="food-form__field">
+          <label className="food-form__label">Fat (%)</label>
           <input
+            className="food-form__input"
             name="fat"
             type="number"
-            placeholder="fat"
+            placeholder="e.g. 4"
             required
-            value={fat}
-            onChange={(e) => {
-              const v = e.target.valueAsNumber;
-              if (!isNaN(v)) setFat(v);
+            value={isNaN(fat) ? "" : fat}
+            onChange={(e) => setFat(e.target.valueAsNumber)}
+            onKeyDown={(e) => {
+              if (e.key === "e" || e.key === "E") e.preventDefault();
             }}
           />
         </div>
-        <div>
-          <button type="submit">Add food item</button>
-        </div>
+        <button
+          className="food-form__btn food-form__btn--primary"
+          type="submit"
+          disabled={
+            !name ||
+            isNaN(caloriesPer100g) ||
+            isNaN(carbs) ||
+            isNaN(protein) ||
+            isNaN(fat)
+          }
+        >
+          Save food item
+        </button>
       </form>
-    </>
+    </div>
   );
 }

@@ -6,8 +6,7 @@ export function Home({ database }: { database: Database }): ReactElement {
   const firstName = database.physicalInfo.name.split(" ")[0];
 
   const hour = new Date().getHours();
-  const timeOfDay =
-    hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
+  const timeOfDay = hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
 
   const todayString = new Date().toDateString();
   const todayMeals = database.meals.filter(
