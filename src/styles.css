@@ -97,10 +97,13 @@ button {
 }
 
 select {
+  -webkit-appearance: none;
+  appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237b8ba0' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--space-sm) center;
-  padding-right: calc(var(--space-md) + 20px);
+  padding: var(--space-sm) calc(var(--space-md) + 20px) var(--space-sm)
+    var(--space-md);
 }
 
 .app {
@@ -270,8 +273,7 @@ select {
   color: var(--muted);
 }
 
-.physical-info__input,
-.physical-info__select {
+.physical-info__input {
   font-size: var(--text-base);
   font-weight: 400;
   color: var(--text);
@@ -281,8 +283,17 @@ select {
   padding: var(--space-sm) var(--space-md);
   width: 100%;
   transition: var(--transition);
-  -webkit-appearance: none;
-  appearance: none;
+}
+
+.physical-info__select {
+  font-size: var(--text-base);
+  font-weight: 400;
+  color: var(--text);
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  transition: var(--transition);
 }
 
 .physical-info__input:focus,
@@ -1054,14 +1065,11 @@ select {
 .meal-form__select {
   font-size: var(--text-base);
   color: var(--text);
-  background: var(--surface-2);
+  background-color: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: var(--space-sm) var(--space-md);
   width: 100%;
   transition: var(--transition);
-  -webkit-appearance: none;
-  appearance: none;
 }
 
 .meal-form__select:focus {
@@ -1307,8 +1315,6 @@ select {
   border-radius: var(--radius-sm);
   padding: var(--space-sm) var(--space-md);
   transition: var(--transition);
-  -webkit-appearance: none;
-  appearance: none;
 }
 
 .meal-form__unit-select:focus {
