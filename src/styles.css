@@ -380,6 +380,11 @@ select {
   filter: brightness(1.1);
 }
 
+.physical-info__btn--primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .physical-info__btn--secondary {
   background: var(--accent-dim);
   color: var(--accent);
@@ -936,6 +941,11 @@ select {
   background: var(--accent-muted);
 }
 
+.food-item__portion-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .food-item__edit-actions {
   display: flex;
   gap: var(--space-sm);
@@ -959,6 +969,11 @@ select {
 
 .food-item__action-btn--primary:hover {
   filter: brightness(1.1);
+}
+
+.food-item__action-btn--primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .food-item__action-btn--ghost {

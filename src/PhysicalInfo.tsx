@@ -21,7 +21,8 @@ export function PhysicalInfo({
   const [fitnessType, setFitnessType] = useState(
     physicalInfo.fitness_level.type,
   );
-  const [weight, setWeight] = useState(0);
+  const [weight, setWeight] = useState(NaN);
+  const [weightLogged, setWeightLogged] = useState(false);
   function handleSave(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setDatabase({
@@ -44,12 +45,33 @@ export function PhysicalInfo({
         ...database.physicalInfo,
         weight: [
           ...database.physicalInfo.weight,
-          { weight, timestamp: Date.now() },
+          { weight: weight * 1000, timestamp: Date.now() },
         ],
       },
     });
-    setWeight(0);
+    setWeight(NaN);
+    setWeightLogged(true);
   }
+  const fitnessLevelChanged =
+    fitnessLevel.type !== physicalInfo.fitness_level.type ||
+    (fitnessLevel.type === "FitnessCategory" &&
+      physicalInfo.fitness_level.type === "FitnessCategory" &&
+      fitnessLevel.category !== physicalInfo.fitness_level.category) ||
+    (fitnessLevel.type === "EnergyExpenditure" &&
+      physicalInfo.fitness_level.type === "EnergyExpenditure" &&
+      fitnessLevel.daily_expenditure_calories !==
+        physicalInfo.fitness_level.daily_expenditure_calories);
+
+  const hasChanges =
+    name !== physicalInfo.name ||
+    sex !== physicalInfo.sex ||
+    height !== physicalInfo.height ||
+    birthdate.day !== physicalInfo.birthdate.day ||
+    birthdate.month !== physicalInfo.birthdate.month ||
+    birthdate.year !== physicalInfo.birthdate.year ||
+    fitnessLevelChanged ||
+    weightLogged;
+
   return (
     <section className="section physical-info">
       <div className="section__header">
@@ -228,11 +250,13 @@ export function PhysicalInfo({
               className="physical-info__input"
               name="weight"
               type="number"
-              placeholder="e.g. 82.5"
-              value={weight}
-              onChange={(e) => {
-                const v = e.target.valueAsNumber;
-                if (!isNaN(v)) setWeight(v);
+              min="0"
+              step="0.1"
+              placeholder="e.g. 77"
+              value={isNaN(weight) ? "" : weight}
+              onChange={(e) => setWeight(e.target.valueAsNumber)}
+              onKeyDown={(e) => {
+                if (e.key === "e" || e.key === "E") e.preventDefault();
               }}
             />
           </div>
@@ -240,6 +264,7 @@ export function PhysicalInfo({
           <button
             className="physical-info__btn physical-info__btn--secondary"
             type="button"
+            disabled={isNaN(weight) || weight <= 0}
             onClick={handleAddWeight}
           >
             Log weight
@@ -249,12 +274,16 @@ export function PhysicalInfo({
             <button
               className="physical-info__btn physical-info__btn--primary"
               type="submit"
+              disabled={!hasChanges}
             >
               Save changes
             </button>
             <button
               className="physical-info__btn physical-info__btn--ghost"
-              onClick={() => setIsEditing(false)}
+              onClick={() => {
+                setIsEditing(false);
+                setWeightLogged(false);
+              }}
               type="button"
             >
               Cancel

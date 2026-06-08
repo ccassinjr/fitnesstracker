@@ -27,6 +27,7 @@ function FoodListItem({
   const [portionName, setPortionName] = useState("");
   const [portionType, setPortionType] = useState<"weight" | "volume">("weight");
   const [portionAmount, setPortionAmount] = useState(NaN);
+  const [portionsChanged, setPortionsChanged] = useState(false);
   function handleSave(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     onEdit({
@@ -40,6 +41,13 @@ function FoodListItem({
     });
     setIsEditing(false);
   }
+  const hasChanges =
+    name !== food.name ||
+    caloriesPer100g !== food.calories_per_100g ||
+    carbs !== food.carbs ||
+    protein !== food.protein ||
+    fat !== food.fat ||
+    portionsChanged;
   return isEditing ? (
     <tr className="food-item food-item--editing">
       <td className="food-item__edit-cell" colSpan={6}>
@@ -119,14 +127,15 @@ function FoodListItem({
                     <button
                       className="food-item__portion-remove"
                       type="button"
-                      onClick={() =>
+                      onClick={() => {
                         onEdit({
                           ...food,
                           common_portions: food.common_portions.filter(
                             (_, index) => index !== i,
                           ),
-                        })
-                      }
+                        });
+                        setPortionsChanged(true);
+                      }}
                     >
                       Remove
                     </button>
@@ -195,6 +204,7 @@ function FoodListItem({
                     });
                     setPortionName("");
                     setPortionAmount(NaN);
+                    setPortionsChanged(true);
                   }}
                 >
                   Add portion
@@ -206,13 +216,17 @@ function FoodListItem({
             <button
               className="food-item__action-btn food-item__action-btn--primary"
               type="submit"
+              disabled={!hasChanges}
             >
               Save changes
             </button>
             <button
               className="food-item__action-btn food-item__action-btn--ghost"
               type="button"
-              onClick={() => setIsEditing(false)}
+              onClick={() => {
+                setIsEditing(false);
+                setPortionsChanged(false);
+              }}
             >
               Cancel
             </button>
@@ -339,7 +353,8 @@ export function FoodList({
               Previous
             </button>
             <span className="food-list__pagination-info">
-              Page {currentPage + 1} of {totalPages} · {filteredFoods.length} items
+              Page {currentPage + 1} of {totalPages} · {filteredFoods.length}{" "}
+              items
             </span>
             <button
               className="food-list__pagination-btn"
