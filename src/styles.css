@@ -1421,7 +1421,6 @@ select {
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: var(--space-sm) var(--space-md);
   transition: var(--transition);
 }
 
