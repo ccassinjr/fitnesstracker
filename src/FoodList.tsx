@@ -28,19 +28,7 @@ function FoodListItem({
   const [portionType, setPortionType] = useState<"weight" | "volume">("weight");
   const [portionAmount, setPortionAmount] = useState(NaN);
   const [portionsChanged, setPortionsChanged] = useState(false);
-  function handleSave(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    onEdit({
-      id: food.id,
-      name: name,
-      calories_per_100g: caloriesPer100g,
-      carbs: carbs,
-      protein: protein,
-      fat: fat,
-      common_portions: food.common_portions,
-    });
-    setIsEditing(false);
-  }
+
   const hasChanges =
     name !== food.name ||
     caloriesPer100g !== food.calories_per_100g ||
@@ -48,220 +36,250 @@ function FoodListItem({
     protein !== food.protein ||
     fat !== food.fat ||
     portionsChanged;
+
+  function handleSave(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    onEdit({
+      id: food.id,
+      name,
+      calories_per_100g: caloriesPer100g,
+      carbs,
+      protein,
+      fat,
+      common_portions: food.common_portions,
+    });
+    setIsEditing(false);
+    setPortionsChanged(false);
+  }
+
   return isEditing ? (
-    <tr className="food-item food-item--editing">
-      <td className="food-item__edit-cell" colSpan={6}>
-        <form className="food-item__edit-form" onSubmit={handleSave}>
-          <div className="food-item__edit-fields">
-            <div className="food-item__edit-field food-item__edit-field--full">
-              <label className="food-item__edit-label">Name</label>
-              <input
-                className="food-item__edit-input"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div className="food-item__edit-field">
-              <label className="food-item__edit-label">Calories per 100g</label>
-              <input
-                className="food-item__edit-input"
-                type="number"
-                value={caloriesPer100g}
-                onChange={(e) => setCaloriesPer100g(e.target.valueAsNumber)}
-                onKeyDown={(e) => {
-                  if (e.key === "e" || e.key === "E") e.preventDefault();
-                }}
-              />
-            </div>
-            <div className="food-item__edit-field">
-              <label className="food-item__edit-label">
-                Carbohydrates per 100g
-              </label>
-              <input
-                className="food-item__edit-input"
-                type="number"
-                value={carbs}
-                onChange={(e) => setCarbs(e.target.valueAsNumber)}
-                onKeyDown={(e) => {
-                  if (e.key === "e" || e.key === "E") e.preventDefault();
-                }}
-              />
-            </div>
-            <div className="food-item__edit-field">
-              <label className="food-item__edit-label">Protein per 100g</label>
-              <input
-                className="food-item__edit-input"
-                type="number"
-                value={protein}
-                onChange={(e) => setProtein(e.target.valueAsNumber)}
-                onKeyDown={(e) => {
-                  if (e.key === "e" || e.key === "E") e.preventDefault();
-                }}
-              />
-            </div>
-            <div className="food-item__edit-field">
-              <label className="food-item__edit-label">Fat per 100g</label>
-              <input
-                className="food-item__edit-input"
-                type="number"
-                value={fat}
-                onChange={(e) => setFat(e.target.valueAsNumber)}
-                onKeyDown={(e) => {
-                  if (e.key === "e" || e.key === "E") e.preventDefault();
-                }}
-              />
-            </div>
+    <li className="food-list__item food-list__item--editing">
+      <form className="food-item__edit-form" onSubmit={handleSave}>
+        <div className="food-item__edit-fields">
+          <div className="food-item__edit-field food-item__edit-field--full">
+            <label className="food-item__edit-label">Name</label>
+            <input
+              className="food-item__edit-input"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
-          <div className="food-item__portions">
-            <h4 className="food-item__portions-title">Common portions</h4>
-            {food.common_portions.length === 0 ? (
-              <p>No portions added yet.</p>
-            ) : (
-              <ul className="food-item__portions-list">
-                {food.common_portions.map((portion, i) => (
-                  <li key={i} className="food-item__portion">
-                    <span className="food-item__portion-text">
-                      {portion.name} — {showPortion(portion.amount)}
-                    </span>
-                    <button
-                      className="food-item__portion-remove"
-                      type="button"
-                      onClick={() => {
-                        onEdit({
-                          ...food,
-                          common_portions: food.common_portions.filter(
-                            (_, index) => index !== i,
-                          ),
-                        });
-                        setPortionsChanged(true);
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="food-item__portion-add">
-              <input
-                className="food-item__edit-input"
-                type="text"
-                placeholder="e.g. 1 cup"
-                value={portionName}
-                onChange={(e) => setPortionName(e.target.value)}
-              />
-              <div className="food-item__portion-row">
-                <div className="food-item__portion-type">
-                  <label className="food-item__radio-label">
-                    <input
-                      className="food-item__radio"
-                      type="radio"
-                      value="weight"
-                      checked={portionType === "weight"}
-                      onChange={() => setPortionType("weight")}
-                    />
-                    Weight (g)
-                  </label>
-                  <label className="food-item__radio-label">
-                    <input
-                      className="food-item__radio"
-                      type="radio"
-                      value="volume"
-                      checked={portionType === "volume"}
-                      onChange={() => setPortionType("volume")}
-                    />
-                    Volume (ml)
-                  </label>
-                </div>
-                <input
-                  className="food-item__edit-input food-item__edit-input--amount"
-                  type="number"
-                  value={isNaN(portionAmount) ? "" : portionAmount}
-                  onChange={(e) => setPortionAmount(e.target.valueAsNumber)}
-                  onKeyDown={(e) => {
-                    if (e.key === "e" || e.key === "E") e.preventDefault();
-                  }}
-                  placeholder="e.g. 250"
-                />
-                <button
-                  className="food-item__portion-btn"
-                  type="button"
-                  disabled={!portionName || isNaN(portionAmount)}
-                  onClick={() => {
-                    onEdit({
-                      ...food,
-                      common_portions: [
-                        ...food.common_portions,
-                        {
-                          name: portionName,
-                          amount:
-                            portionType === "weight"
-                              ? { type: "weight", grams: portionAmount }
-                              : { type: "volume", milliliters: portionAmount },
-                        },
-                      ],
-                    });
-                    setPortionName("");
-                    setPortionAmount(NaN);
-                    setPortionsChanged(true);
-                  }}
-                >
-                  Add portion
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="food-item__edit-actions">
-            <button
-              className="food-item__action-btn food-item__action-btn--primary"
-              type="submit"
-              disabled={!hasChanges}
-            >
-              Save changes
-            </button>
-            <button
-              className="food-item__action-btn food-item__action-btn--ghost"
-              type="button"
-              onClick={() => {
-                setIsEditing(false);
-                setPortionsChanged(false);
+          <div className="food-item__edit-field">
+            <label className="food-item__edit-label">Calories per 100g</label>
+            <input
+              className="food-item__edit-input"
+              type="number"
+              value={caloriesPer100g}
+              onChange={(e) => setCaloriesPer100g(e.target.valueAsNumber)}
+              onKeyDown={(e) => {
+                if (e.key === "e" || e.key === "E") e.preventDefault();
               }}
-            >
-              Cancel
-            </button>
+            />
           </div>
-        </form>
-      </td>
-    </tr>
+          <div className="food-item__edit-field">
+            <label className="food-item__edit-label">
+              Carbohydrates per 100g
+            </label>
+            <input
+              className="food-item__edit-input"
+              type="number"
+              value={carbs}
+              onChange={(e) => setCarbs(e.target.valueAsNumber)}
+              onKeyDown={(e) => {
+                if (e.key === "e" || e.key === "E") e.preventDefault();
+              }}
+            />
+          </div>
+          <div className="food-item__edit-field">
+            <label className="food-item__edit-label">Protein per 100g</label>
+            <input
+              className="food-item__edit-input"
+              type="number"
+              value={protein}
+              onChange={(e) => setProtein(e.target.valueAsNumber)}
+              onKeyDown={(e) => {
+                if (e.key === "e" || e.key === "E") e.preventDefault();
+              }}
+            />
+          </div>
+          <div className="food-item__edit-field">
+            <label className="food-item__edit-label">Fat per 100g</label>
+            <input
+              className="food-item__edit-input"
+              type="number"
+              value={fat}
+              onChange={(e) => setFat(e.target.valueAsNumber)}
+              onKeyDown={(e) => {
+                if (e.key === "e" || e.key === "E") e.preventDefault();
+              }}
+            />
+          </div>
+        </div>
+        <div className="food-item__portions">
+          <h4 className="food-item__portions-title">Common portions</h4>
+          {food.common_portions.length === 0 ? (
+            <p>No portions added yet.</p>
+          ) : (
+            <ul className="food-item__portions-list">
+              {food.common_portions.map((portion, i) => (
+                <li key={i} className="food-item__portion">
+                  <span className="food-item__portion-text">
+                    {portion.name} — {showPortion(portion.amount)}
+                  </span>
+                  <button
+                    className="food-item__portion-remove"
+                    type="button"
+                    onClick={() => {
+                      onEdit({
+                        ...food,
+                        common_portions: food.common_portions.filter(
+                          (_, index) => index !== i,
+                        ),
+                      });
+                      setPortionsChanged(true);
+                    }}
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="food-item__portion-add">
+            <input
+              className="food-item__edit-input"
+              type="text"
+              placeholder="e.g. 1 cup"
+              value={portionName}
+              onChange={(e) => setPortionName(e.target.value)}
+            />
+            <div className="food-item__portion-row">
+              <div className="food-item__portion-type">
+                <label className="food-item__radio-label">
+                  <input
+                    className="food-item__radio"
+                    type="radio"
+                    value="weight"
+                    checked={portionType === "weight"}
+                    onChange={() => setPortionType("weight")}
+                  />
+                  Weight (g)
+                </label>
+                <label className="food-item__radio-label">
+                  <input
+                    className="food-item__radio"
+                    type="radio"
+                    value="volume"
+                    checked={portionType === "volume"}
+                    onChange={() => setPortionType("volume")}
+                  />
+                  Volume (ml)
+                </label>
+              </div>
+              <input
+                className="food-item__edit-input food-item__edit-input--amount"
+                type="number"
+                placeholder="e.g. 250"
+                value={isNaN(portionAmount) ? "" : portionAmount}
+                onChange={(e) => setPortionAmount(e.target.valueAsNumber)}
+                onKeyDown={(e) => {
+                  if (e.key === "e" || e.key === "E") e.preventDefault();
+                }}
+              />
+              <button
+                className="food-item__portion-btn"
+                type="button"
+                disabled={!portionName || isNaN(portionAmount)}
+                onClick={() => {
+                  onEdit({
+                    ...food,
+                    common_portions: [
+                      ...food.common_portions,
+                      {
+                        name: portionName,
+                        amount:
+                          portionType === "weight"
+                            ? { type: "weight", grams: portionAmount }
+                            : { type: "volume", milliliters: portionAmount },
+                      },
+                    ],
+                  });
+                  setPortionName("");
+                  setPortionAmount(NaN);
+                  setPortionsChanged(true);
+                }}
+              >
+                Add portion
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="food-item__edit-actions">
+          <button
+            className="food-item__action-btn food-item__action-btn--primary"
+            type="submit"
+            disabled={!hasChanges}
+          >
+            Save changes
+          </button>
+          <button
+            className="food-item__action-btn food-item__action-btn--ghost"
+            type="button"
+            onClick={() => {
+              setIsEditing(false);
+              setPortionsChanged(false);
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </li>
   ) : (
-    <tr className="food-item">
-      <td className="food-item__cell food-item__cell--name">
-        {highlightMatch(food.name, matchIndices)}
-      </td>
-      <td className="food-item__cell food-item__cell--value">
-        {food.calories_per_100g}
-      </td>
-      <td className="food-item__cell food-item__cell--value">{food.carbs}</td>
-      <td className="food-item__cell food-item__cell--value">{food.protein}</td>
-      <td className="food-item__cell food-item__cell--value">{food.fat}</td>
-      <td className="food-item__cell food-item__cell--actions">
-        <button
-          className="food-item__btn food-item__btn--edit"
-          type="button"
-          onClick={() => setIsEditing(true)}
-        >
-          Edit
-        </button>
-        <button
-          className="food-item__btn food-item__btn--remove"
-          type="button"
-          onClick={() => onDelete()}
-        >
-          Remove
-        </button>
-      </td>
-    </tr>
+    <li className="food-list__item">
+      <div className="food-list__item-header">
+        <span className="food-list__item-name">
+          {highlightMatch(food.name, matchIndices)}
+        </span>
+        <div className="food-list__item-actions">
+          <button
+            className="food-list__item-btn food-list__item-btn--edit"
+            type="button"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit
+          </button>
+          <button
+            className="food-list__item-btn food-list__item-btn--remove"
+            type="button"
+            onClick={() => onDelete()}
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+      <div className="food-list__item-macros">
+        <div className="food-list__item-macro">
+          <span className="food-list__item-macro-value food-list__item-macro-value--accent">
+            {food.calories_per_100g}
+          </span>
+          <span className="food-list__item-macro-label">kcal</span>
+        </div>
+        <div className="food-list__item-macro">
+          <span className="food-list__item-macro-value">{food.carbs}g</span>
+          <span className="food-list__item-macro-label">carbs</span>
+        </div>
+        <div className="food-list__item-macro">
+          <span className="food-list__item-macro-value">{food.protein}g</span>
+          <span className="food-list__item-macro-label">protein</span>
+        </div>
+        <div className="food-list__item-macro">
+          <span className="food-list__item-macro-value">{food.fat}g</span>
+          <span className="food-list__item-macro-label">fat</span>
+        </div>
+      </div>
+    </li>
   );
 }
 
@@ -314,35 +332,21 @@ export function FoodList({
           setPage(0);
         }}
       />
-      {query.trim() === "" ? null : filteredFoods.length === 0 ? (
+      {query.trim() !== "" && filteredFoods.length === 0 ? (
         <p className="food-list__empty">No results for "{query}".</p>
-      ) : (
+      ) : filteredFoods.length > 0 ? (
         <>
-          <div className="food-list__table-wrapper">
-            <table className="food-list__table">
-              <thead>
-                <tr>
-                  <th className="food-list__th food-list__th--name">Name</th>
-                  <th className="food-list__th">kcal / 100g</th>
-                  <th className="food-list__th">Carbs g</th>
-                  <th className="food-list__th">Protein g</th>
-                  <th className="food-list__th">Fat g</th>
-                  <th className="food-list__th food-list__th--actions"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {pageItems.map(({ food, originalIndex, matchIndices }) => (
-                  <FoodListItem
-                    key={originalIndex}
-                    food={food}
-                    matchIndices={matchIndices}
-                    onDelete={() => onDeleteFood(originalIndex)}
-                    onEdit={onEdit}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="food-list__items">
+            {pageItems.map(({ food, originalIndex, matchIndices }) => (
+              <FoodListItem
+                key={originalIndex}
+                food={food}
+                matchIndices={matchIndices}
+                onDelete={() => onDeleteFood(originalIndex)}
+                onEdit={onEdit}
+              />
+            ))}
+          </ul>
           <div className="food-list__pagination">
             <button
               className="food-list__pagination-btn"
@@ -366,7 +370,7 @@ export function FoodList({
             </button>
           </div>
         </>
-      )}
+      ) : null}
     </div>
   );
 }
