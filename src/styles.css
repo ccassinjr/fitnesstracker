@@ -782,8 +782,6 @@ select {
   text-align: center;
 }
 
-/* ── food-item ───────────────────────────────────────────────────── */
-
 .food-item__edit-form {
   display: flex;
   flex-direction: column;
@@ -995,8 +993,6 @@ select {
   border-color: var(--muted);
 }
 
-/* ── food-form ───────────────────────────────────────────────────── */
-
 .food-form__form {
   display: flex;
   flex-direction: column;
@@ -1190,54 +1186,103 @@ select {
   font-style: italic;
 }
 
-.meal-form__table-wrapper {
-  overflow-x: auto;
+.meal-form__food-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
 }
 
-.meal-form__table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 500px;
+.meal-form__food-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
-.meal-form__th {
-  font-size: var(--text-xs);
-  font-weight: 500;
-  color: var(--muted);
-  text-align: left;
-  padding: var(--space-xs) var(--space-sm);
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
+.meal-form__food-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
 }
 
-.meal-form__th--name {
-  width: 35%;
-}
-
-.meal-form__row:nth-child(even) {
-  background: var(--surface-2);
-}
-
-.meal-form__cell {
+.meal-form__food-item-name {
   font-size: var(--text-sm);
-  color: var(--text);
-  padding: var(--space-sm);
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-}
-
-.meal-form__cell--name {
   font-weight: 500;
+  color: var(--text);
+  flex: 1;
 }
 
-.meal-form__cell--unknown {
+.meal-form__food-item-quantity {
+  font-size: var(--text-xs);
   color: var(--muted);
+}
+
+.meal-form__food-item-macros {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--border);
+}
+
+.meal-form__food-item-macro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.meal-form__food-item-macro-value {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.meal-form__food-item-macro-value--accent {
+  color: var(--accent);
+}
+
+.meal-form__food-item-macro-label {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.meal-form__food-item-volume-note {
   font-style: italic;
 }
 
-.meal-form__cell--actions {
-  text-align: right;
-  white-space: nowrap;
+.meal-form__totals {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.meal-form__totals-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.meal-form__totals-label {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.meal-form__totals-quantity {
+  font-size: var(--text-xs);
+  color: var(--muted);
 }
 
 .meal-form__remove {
@@ -1255,23 +1300,6 @@ select {
 .meal-form__remove:hover {
   color: var(--danger);
   border-color: var(--danger);
-}
-
-.meal-form__total-row {
-  background: var(--surface-2);
-}
-
-.meal-form__total-cell {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--text);
-  padding: var(--space-sm);
-  border-top: 1px solid var(--border);
-}
-
-.meal-form__total-cell--label {
-  color: var(--muted);
-  font-weight: 400;
 }
 
 .meal-form__search-section {

@@ -29,7 +29,7 @@ export function LogMeal({
   const [query, setQuery] = useState("");
   const [pendingFood, setPendingFood] = useState<FoodItem | null>(null);
   const [pendingUnit, setPendingUnit] = useState<"weight" | "volume">("weight");
-  const [pendingAmount, setPendingAmount] = useState<number>(100);
+  const [pendingAmount, setPendingAmount] = useState<number>(NaN);
 
   const topResults = useMemo(() => {
     if (query.trim() === "") return [];
@@ -54,10 +54,6 @@ export function LogMeal({
     [database.foods],
   );
 
-  // Totals are computed from the chosen portions (not the raw per-100g
-  // column values), so the row shows the real meal calories and macro
-  // grams. Volume entries don't contribute to nutritional totals because
-  // we have no density to convert ml to grams.
   const totals = useMemo(() => {
     let grams = 0;
     let milliliters = 0;
@@ -157,120 +153,118 @@ export function LogMeal({
           {selectedFoods.length === 0 ? (
             <p className="meal-form__foods-empty">No foods added yet.</p>
           ) : (
-            <div className="meal-form__table-wrapper">
-              <table className="meal-form__table">
-                <thead>
-                  <tr>
-                    <th className="meal-form__th meal-form__th--name">Name</th>
-                    <th className="meal-form__th">Quantity</th>
-                    <th className="meal-form__th">kcal</th>
-                    <th className="meal-form__th">Carbs g</th>
-                    <th className="meal-form__th">Protein g</th>
-                    <th className="meal-form__th">Fat g</th>
-                    <th className="meal-form__th"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedFoods.map((entry, i) => {
-                    const food = foodById.get(entry.food);
-                    if (food === undefined) {
-                      return (
-                        <tr key={i} className="meal-form__row">
-                          <td className="meal-form__cell meal-form__cell--unknown">
-                            (unknown food)
-                          </td>
-                          <td className="meal-form__cell">
-                            {showPortion(entry.quantity)}
-                          </td>
-                          <td className="meal-form__cell" colSpan={4}></td>
-                          <td className="meal-form__cell meal-form__cell--actions">
-                            <button
-                              className="meal-form__remove"
-                              type="button"
-                              onClick={() => removeFood(i)}
-                            >
-                              Remove
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    }
-                    return (
-                      <tr key={i} className="meal-form__row">
-                        <td className="meal-form__cell meal-form__cell--name">
-                          {food.name}
-                        </td>
-                        <td className="meal-form__cell">
-                          {showPortion(entry.quantity)}
-                        </td>
-                        {entry.quantity.type === "weight" ? (
-                          <>
-                            <td className="meal-form__cell">
-                              {formatTotal(
-                                (food.calories_per_100g *
-                                  entry.quantity.grams) /
-                                  100,
-                              )}
-                            </td>
-                            <td className="meal-form__cell">
-                              {formatTotal(
-                                (food.carbs * entry.quantity.grams) / 100,
-                              )}
-                            </td>
-                            <td className="meal-form__cell">
-                              {formatTotal(
-                                (food.protein * entry.quantity.grams) / 100,
-                              )}
-                            </td>
-                            <td className="meal-form__cell">
-                              {formatTotal(
-                                (food.fat * entry.quantity.grams) / 100,
-                              )}
-                            </td>
-                          </>
-                        ) : (
-                          <td className="meal-form__cell" colSpan={4}>
-                            —
-                          </td>
-                        )}
-                        <td className="meal-form__cell meal-form__cell--actions">
-                          <button
-                            className="meal-form__remove"
-                            type="button"
-                            onClick={() => removeFood(i)}
-                          >
-                            Remove
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr className="meal-form__total-row">
-                    <td className="meal-form__total-cell meal-form__total-cell--label">
-                      Total
-                    </td>
-                    <td className="meal-form__total-cell">
-                      {showTotalQuantity(totals.grams, totals.milliliters)}
-                    </td>
-                    <td className="meal-form__total-cell">
+            <>
+              <ul className="meal-form__food-list">
+                {selectedFoods.map((entry, i) => {
+                  const food = foodById.get(entry.food);
+                  const isVolume = entry.quantity.type === "volume";
+                  const grams =
+                    entry.quantity.type === "weight" ? entry.quantity.grams : 0;
+                  const factor = grams / 100;
+                  return (
+                    <li key={i} className="meal-form__food-item">
+                      <div className="meal-form__food-item-header">
+                        <span className="meal-form__food-item-name">
+                          {food?.name ?? "(unknown food)"}
+                        </span>
+                        <button
+                          className="meal-form__remove"
+                          type="button"
+                          onClick={() => removeFood(i)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <span className="meal-form__food-item-quantity">
+                        {showPortion(entry.quantity)}
+                      </span>
+                      {!isVolume && food ? (
+                        <div className="meal-form__food-item-macros">
+                          <div className="meal-form__food-item-macro">
+                            <span className="meal-form__food-item-macro-value meal-form__food-item-macro-value--accent">
+                              {formatTotal(food.calories_per_100g * factor)}
+                            </span>
+                            <span className="meal-form__food-item-macro-label">
+                              kcal
+                            </span>
+                          </div>
+                          <div className="meal-form__food-item-macro">
+                            <span className="meal-form__food-item-macro-value">
+                              {formatTotal(food.carbs * factor)}g
+                            </span>
+                            <span className="meal-form__food-item-macro-label">
+                              carbs
+                            </span>
+                          </div>
+                          <div className="meal-form__food-item-macro">
+                            <span className="meal-form__food-item-macro-value">
+                              {formatTotal(food.protein * factor)}g
+                            </span>
+                            <span className="meal-form__food-item-macro-label">
+                              protein
+                            </span>
+                          </div>
+                          <div className="meal-form__food-item-macro">
+                            <span className="meal-form__food-item-macro-value">
+                              {formatTotal(food.fat * factor)}g
+                            </span>
+                            <span className="meal-form__food-item-macro-label">
+                              fat
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="meal-form__food-item-volume-note">
+                          Nutrition unavailable for volume entries
+                        </p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="meal-form__totals">
+                <div className="meal-form__totals-header">
+                  <span className="meal-form__totals-label">Total</span>
+                  <span className="meal-form__totals-quantity">
+                    {showTotalQuantity(totals.grams, totals.milliliters)}
+                  </span>
+                </div>
+                <div className="meal-form__food-item-macros">
+                  <div className="meal-form__food-item-macro">
+                    <span className="meal-form__food-item-macro-value meal-form__food-item-macro-value--accent">
                       {formatTotal(totals.calories)}
-                    </td>
-                    <td className="meal-form__total-cell">
-                      {formatTotal(totals.carbs)}
-                    </td>
-                    <td className="meal-form__total-cell">
-                      {formatTotal(totals.protein)}
-                    </td>
-                    <td className="meal-form__total-cell">
-                      {formatTotal(totals.fat)}
-                    </td>
-                    <td className="meal-form__total-cell"></td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+                    </span>
+                    <span className="meal-form__food-item-macro-label">
+                      kcal
+                    </span>
+                  </div>
+                  <div className="meal-form__food-item-macro">
+                    <span className="meal-form__food-item-macro-value">
+                      {formatTotal(totals.carbs)}g
+                    </span>
+                    <span className="meal-form__food-item-macro-label">
+                      carbs
+                    </span>
+                  </div>
+                  <div className="meal-form__food-item-macro">
+                    <span className="meal-form__food-item-macro-value">
+                      {formatTotal(totals.protein)}g
+                    </span>
+                    <span className="meal-form__food-item-macro-label">
+                      protein
+                    </span>
+                  </div>
+                  <div className="meal-form__food-item-macro">
+                    <span className="meal-form__food-item-macro-value">
+                      {formatTotal(totals.fat)}g
+                    </span>
+                    <span className="meal-form__food-item-macro-label">
+                      fat
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
         <div className="meal-form__search-section">
