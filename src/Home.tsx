@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import type { Database } from "./types";
 import { capitalise } from "./utils";
+import "./styles/home.css";
 
 export function Home({ database }: { database: Database }): ReactElement {
   const firstName = database.physicalInfo.name.split(" ")[0];

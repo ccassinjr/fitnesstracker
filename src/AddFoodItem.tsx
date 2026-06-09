@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { Database, SetDatabase } from "./types";
 import { titleCase } from "./utils";
+import "./styles/food.css";
 
 export function AddFoodItem({
   database,

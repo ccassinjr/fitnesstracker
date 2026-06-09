@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import type { Database, SetDatabase } from "./types";
 import { showTimestamp, showPortion, capitalise } from "./utils";
+import "./styles/meals.css";
 
 export function MealLog({
   database,

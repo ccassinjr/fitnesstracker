@@ -14,6 +14,7 @@ import {
   capitalise,
 } from "./utils";
 import { fuzzyMatch, fuzzyScore, highlightMatch } from "./fuzzy";
+import "./styles/meals.css";
 
 const MEAL_TYPES: Array<MealType> = ["breakfast", "lunch", "dinner", "snack"];
 

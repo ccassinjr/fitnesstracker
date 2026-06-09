@@ -21,6 +21,7 @@ import { FoodList } from "./FoodList";
 import { AddFoodItem } from "./AddFoodItem";
 import { LogMeal } from "./LogMeal";
 import { MealLog } from "./MealLog";
+import "./styles/globals.css";
 
 export function App() {
   const [database, setDatabaseState] = useState<Database>(

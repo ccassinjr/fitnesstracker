@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import type { TopNav } from "./types";
 import { cn } from "./utils";
 import { Home, Utensils, Dumbbell, CalendarDays, User } from "lucide-react";
+import "./styles/bottom-nav.css";
 
 export function BottomNav({
   active,

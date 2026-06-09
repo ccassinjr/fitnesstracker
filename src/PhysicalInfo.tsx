@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ReactElement } from "react";
 import type { PhysicalInfo, Database, SetDatabase } from "./types";
 import { showTimestamp, showWeight } from "./utils";
+import "./styles/physical-info.css";
 
 export function PhysicalInfo({
   physicalInfo,

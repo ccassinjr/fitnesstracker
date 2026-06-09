@@ -2,8 +2,9 @@ import { useState, type FormEvent, type ReactElement } from "react";
 import type { FoodItem } from "./types";
 import { showPortion } from "./utils";
 import { fuzzyMatch, fuzzyScore, highlightMatch } from "./fuzzy";
+import "./styles/food.css";
 
-const FOOD_PAGE_SIZE = 15;
+const FOOD_PAGE_SIZE = 10;
 
 function FoodListItem({
   food,
