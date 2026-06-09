@@ -154,6 +154,9 @@ function FoodListItem({
               value={portionName}
               onChange={(e) => setPortionName(e.target.value)}
             />
+            <p className="food-item__portion-hint">
+              Enter a name and amount to add a portion.
+            </p>
             <div className="food-item__portion-row">
               <div className="food-item__portion-type">
                 <label className="food-item__radio-label">

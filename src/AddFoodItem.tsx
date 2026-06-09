@@ -48,14 +48,14 @@ export function AddFoodItem({
   return (
     <div className="section food-form">
       <div className="section__header">
-        <h2 className="section__title">Add food item</h2>
+        <h2 className="section__title">New food item</h2>
         {!isOpen && (
           <button
             className="food-form__toggle"
             type="button"
             onClick={() => setIsOpen(true)}
           >
-            Add item
+            Add
           </button>
         )}
       </div>

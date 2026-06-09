@@ -75,7 +75,7 @@ export function PhysicalInfo({
   return (
     <section className="section physical-info">
       <div className="section__header">
-        <h2 className="section__title">Physical Information</h2>
+        <h2 className="section__title">Physical information</h2>
         {!isEditing && (
           <button
             className="physical-info__edit-btn"
@@ -118,6 +118,8 @@ export function PhysicalInfo({
             <input
               className="physical-info__input"
               type="number"
+              min="50"
+              max="250"
               value={height}
               onChange={(e) => setHeight(e.target.valueAsNumber)}
             />
@@ -131,6 +133,8 @@ export function PhysicalInfo({
                 <input
                   className="physical-info__input physical-info__input--dob"
                   type="number"
+                  min="1"
+                  max="31"
                   value={birthdate.day}
                   onChange={(e) =>
                     setBirthdate({ ...birthdate, day: e.target.valueAsNumber })
@@ -142,6 +146,8 @@ export function PhysicalInfo({
                 <input
                   className="physical-info__input physical-info__input--dob"
                   type="number"
+                  min="1"
+                  max="12"
                   value={birthdate.month}
                   onChange={(e) =>
                     setBirthdate({
@@ -156,6 +162,8 @@ export function PhysicalInfo({
                 <input
                   className="physical-info__input physical-info__input--dob"
                   type="number"
+                  min="1900"
+                  max="2026"
                   value={birthdate.year}
                   onChange={(e) =>
                     setBirthdate({ ...birthdate, year: e.target.valueAsNumber })
