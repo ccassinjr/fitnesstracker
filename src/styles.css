@@ -1137,6 +1137,7 @@ select {
 .food-form__btn--primary {
   background: var(--accent);
   color: var(--bg);
+  flex: 1;
 }
 
 .food-form__btn--primary:hover {
@@ -1146,6 +1147,39 @@ select {
 .food-form__btn--primary:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.food-form__toggle {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-muted);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.food-form__toggle:hover {
+  background: var(--accent-muted);
+}
+
+.food-form__actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.food-form__btn--ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  flex: 1;
+}
+
+.food-form__btn--ghost:hover {
+  color: var(--text);
+  border-color: var(--muted);
 }
 
 .meal-form__form {
