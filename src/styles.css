@@ -1244,10 +1244,6 @@ select {
   box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
-.meal-form__foods-empty {
-  font-style: italic;
-}
-
 .meal-form__food-list {
   display: flex;
   flex-direction: column;
