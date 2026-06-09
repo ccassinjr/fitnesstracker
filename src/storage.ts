@@ -3,12 +3,12 @@ import type { Database, TopNav } from "./types";
 
 export const initialDatabase: Database = {
   physicalInfo: {
-    name: "Carlos Junior",
-    height: 181,
+    name: "",
+    height: 0,
     sex: "male",
-    birthdate: { day: 26, month: 7, year: 1994 },
+    birthdate: { day: 1, month: 1, year: 2000 },
     fitness_level: { type: "FitnessCategory", category: "moderately active" },
-    weight: [{ weight: 77000, timestamp: 1776016587021 }],
+    weight: [],
   },
   foods: foodDatabase,
   meals: [],
