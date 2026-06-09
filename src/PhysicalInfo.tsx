@@ -16,7 +16,9 @@ export function PhysicalInfo({
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(physicalInfo.name);
   const [sex, setSex] = useState(physicalInfo.sex);
-  const [height, setHeight] = useState(physicalInfo.height);
+  const [height, setHeight] = useState(
+    physicalInfo.height === 0 ? NaN : physicalInfo.height,
+  );
   const [birthdate, setBirthdate] = useState(physicalInfo.birthdate);
   const [fitnessLevel, setFitnessLevel] = useState(physicalInfo.fitness_level);
   const [fitnessType, setFitnessType] = useState(
@@ -24,6 +26,13 @@ export function PhysicalInfo({
   );
   const [weight, setWeight] = useState(NaN);
   const [weightLogged, setWeightLogged] = useState(false);
+  const [touched, setTouched] = useState({
+    height: false,
+    day: false,
+    month: false,
+    year: false,
+    weight: false,
+  });
   function handleSave(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setDatabase({
@@ -37,6 +46,7 @@ export function PhysicalInfo({
         fitness_level: fitnessLevel,
       },
     });
+    setWeight(NaN);
     setIsEditing(false);
   }
   function handleAddWeight() {
@@ -66,12 +76,32 @@ export function PhysicalInfo({
   const hasChanges =
     name !== physicalInfo.name ||
     sex !== physicalInfo.sex ||
-    height !== physicalInfo.height ||
-    birthdate.day !== physicalInfo.birthdate.day ||
-    birthdate.month !== physicalInfo.birthdate.month ||
-    birthdate.year !== physicalInfo.birthdate.year ||
+    (isNaN(height)
+      ? physicalInfo.height !== 0
+      : height !== physicalInfo.height) ||
+    (birthdate.day === 0
+      ? physicalInfo.birthdate.day !== 0
+      : birthdate.day !== physicalInfo.birthdate.day) ||
+    (birthdate.month === 0
+      ? physicalInfo.birthdate.month !== 0
+      : birthdate.month !== physicalInfo.birthdate.month) ||
+    (birthdate.year === 0
+      ? physicalInfo.birthdate.year !== 0
+      : birthdate.year !== physicalInfo.birthdate.year) ||
     fitnessLevelChanged ||
     weightLogged;
+
+  const formValid =
+    name.trim().length > 0 &&
+    !isNaN(height) &&
+    height >= 50 &&
+    height <= 250 &&
+    birthdate.day >= 1 &&
+    birthdate.day <= 31 &&
+    birthdate.month >= 1 &&
+    birthdate.month <= 12 &&
+    birthdate.year >= 1900 &&
+    birthdate.year <= 2026;
 
   return (
     <section className="section physical-info">
@@ -87,7 +117,7 @@ export function PhysicalInfo({
         )}
       </div>
       {isEditing ? (
-        <form className="physical-info__form" onSubmit={handleSave}>
+        <form className="physical-info__form" noValidate onSubmit={handleSave}>
           <div className="physical-info__field">
             <label className="physical-info__label">Name</label>
             <input
@@ -121,9 +151,16 @@ export function PhysicalInfo({
               type="number"
               min="50"
               max="250"
+              placeholder="e.g. 181"
               value={height}
               onChange={(e) => setHeight(e.target.valueAsNumber)}
+              onBlur={() => setTouched((t) => ({ ...t, height: true }))}
             />
+            {touched.height && (height < 50 || height > 250) && (
+              <p className="physical-info__error">
+                Enter a height between 50 and 250 cm.
+              </p>
+            )}
           </div>
 
           <div className="physical-info__field">
@@ -136,11 +173,20 @@ export function PhysicalInfo({
                   type="number"
                   min="1"
                   max="31"
-                  value={birthdate.day}
+                  placeholder="1"
+                  value={birthdate.day === 0 ? "" : birthdate.day}
                   onChange={(e) =>
                     setBirthdate({ ...birthdate, day: e.target.valueAsNumber })
                   }
+                  onBlur={() => setTouched((t) => ({ ...t, day: true }))}
                 />
+                {touched.day &&
+                  birthdate.day !== 0 &&
+                  (birthdate.day < 1 || birthdate.day > 31) && (
+                    <p className="physical-info__error">
+                      Enter a day between 1 and 31.
+                    </p>
+                  )}
               </div>
               <div className="physical-info__dob-field">
                 <label className="physical-info__dob-label">Month</label>
@@ -149,14 +195,23 @@ export function PhysicalInfo({
                   type="number"
                   min="1"
                   max="12"
-                  value={birthdate.month}
+                  placeholder="1"
+                  value={birthdate.month === 0 ? "" : birthdate.month}
                   onChange={(e) =>
                     setBirthdate({
                       ...birthdate,
                       month: e.target.valueAsNumber,
                     })
                   }
+                  onBlur={() => setTouched((t) => ({ ...t, month: true }))}
                 />
+                {touched.month &&
+                  birthdate.month !== 0 &&
+                  (birthdate.month < 1 || birthdate.month > 12) && (
+                    <p className="physical-info__error">
+                      Enter a month between 1 and 12.
+                    </p>
+                  )}
               </div>
               <div className="physical-info__dob-field">
                 <label className="physical-info__dob-label">Year</label>
@@ -165,11 +220,20 @@ export function PhysicalInfo({
                   type="number"
                   min="1900"
                   max="2026"
-                  value={birthdate.year}
+                  placeholder="1990"
+                  value={birthdate.year === 0 ? "" : birthdate.year}
                   onChange={(e) =>
                     setBirthdate({ ...birthdate, year: e.target.valueAsNumber })
                   }
+                  onBlur={() => setTouched((t) => ({ ...t, year: true }))}
                 />
+                {touched.year &&
+                  birthdate.year !== 0 &&
+                  (birthdate.year < 1900 || birthdate.year > 2026) && (
+                    <p className="physical-info__error">
+                      Enter a year between 1900 and 2026.
+                    </p>
+                  )}
               </div>
             </div>
           </div>
@@ -267,7 +331,17 @@ export function PhysicalInfo({
               onKeyDown={(e) => {
                 if (e.key === "e" || e.key === "E") e.preventDefault();
               }}
+              onBlur={(e) => {
+                setTouched((t) => ({ ...t, weight: true }));
+                const v = e.target.valueAsNumber;
+                if (!isNaN(v) && v <= 0) setWeight(NaN);
+              }}
             />
+            {touched.weight && !isNaN(weight) && weight <= 0 && (
+              <p className="physical-info__error">
+                Enter a weight greater than 0.
+              </p>
+            )}
           </div>
 
           <button
@@ -283,7 +357,7 @@ export function PhysicalInfo({
             <button
               className="physical-info__btn physical-info__btn--primary"
               type="submit"
-              disabled={!hasChanges}
+              disabled={!hasChanges || !formValid}
             >
               Save changes
             </button>
@@ -292,6 +366,7 @@ export function PhysicalInfo({
               onClick={() => {
                 setIsEditing(false);
                 setWeightLogged(false);
+                setWeight(NaN);
               }}
               type="button"
             >
@@ -304,7 +379,9 @@ export function PhysicalInfo({
           <dl className="physical-info__stats">
             <div className="physical-info__stat">
               <dt className="physical-info__stat-label">Name</dt>
-              <dd className="physical-info__stat-value">{physicalInfo.name}</dd>
+              <dd className="physical-info__stat-value">
+                {physicalInfo.name || "Not set"}
+              </dd>
             </div>
             <div className="physical-info__stat">
               <dt className="physical-info__stat-label">Sex</dt>
@@ -313,14 +390,17 @@ export function PhysicalInfo({
             <div className="physical-info__stat">
               <dt className="physical-info__stat-label">Height</dt>
               <dd className="physical-info__stat-value">
-                {physicalInfo.height} cm
+                {physicalInfo.height === 0 || isNaN(physicalInfo.height)
+                  ? "Not set"
+                  : `${physicalInfo.height} cm`}
               </dd>
             </div>
             <div className="physical-info__stat">
               <dt className="physical-info__stat-label">Date of birth</dt>
               <dd className="physical-info__stat-value">
-                {physicalInfo.birthdate.day}/{physicalInfo.birthdate.month}/
-                {physicalInfo.birthdate.year}
+                {physicalInfo.birthdate.day === 0
+                  ? "Not set"
+                  : `${physicalInfo.birthdate.day}/${physicalInfo.birthdate.month}/${physicalInfo.birthdate.year}`}
               </dd>
             </div>
             <div className="physical-info__stat">
@@ -346,26 +426,18 @@ export function PhysicalInfo({
 
       <div className="physical-info__weight-history">
         <h3 className="physical-info__weight-history-title">Weight history</h3>
-        <table className="physical-info__table">
-          <thead className="physical-info__table-head">
-            <tr>
-              <th className="physical-info__table-header">Weight</th>
-              <th className="physical-info__table-header">Date</th>
-            </tr>
-          </thead>
-          <tbody className="physical-info__table-body">
-            {physicalInfo.weight.map((entry, i) => (
-              <tr className="physical-info__table-row" key={i}>
-                <td className="physical-info__table-cell">
-                  {showWeight(entry.weight)}
-                </td>
-                <td className="physical-info__table-cell">
-                  {showTimestamp(entry.timestamp)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul className="physical-info__weight-list">
+          {physicalInfo.weight.map((entry, i) => (
+            <li key={i} className="physical-info__weight-item">
+              <span className="physical-info__weight-value">
+                {showWeight(entry.weight)}
+              </span>
+              <span className="physical-info__weight-date">
+                {showTimestamp(entry.timestamp)}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
