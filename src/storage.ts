@@ -12,18 +12,27 @@ export const initialDatabase: Database = {
   },
   foods: foodDatabase,
   meals: [],
+  exercises: [],
+  routines: [],
+  sessions: [],
 };
 
 const DB_KEY = "database";
 
 export function loadDatabase(): Database | null {
   const found = window.localStorage.getItem(DB_KEY);
-  if (found === null) {
-    return null;
-  }
+  if (found === null) return null;
 
   const database = JSON.parse(found) as Database;
-  return database;
+
+  // Migrate: backfill training arrays missing from databases
+  // stored before training was added.
+  return {
+    ...database,
+    exercises: database.exercises ?? [],
+    routines: database.routines ?? [],
+    sessions: database.sessions ?? [],
+  };
 }
 
 export function saveDatabase(database: Database): void {
